@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tom Family Financial Dashboard â 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a1a2e; }
+  .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 20px 30px; display: flex; align-items: center; justify-content: space-between; }
+  .header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; }
+  .header .subtitle { font-size: 0.8rem; opacity: 0.7; margin-top: 2px; }
+  .header .updated { font-size: 0.75rem; opacity: 0.6; }
+  .controls { background: white; padding: 14px 30px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .controls label { font-size: 0.8rem; color: #64748b; font-weight: 500; }
+  .controls select { border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-size: 0.85rem; color: #1a1a2e; background: white; cursor: pointer; }
+  .toggle-wrap { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .toggle-label { font-size: 0.85rem; font-weight: 600; color: #475569; }
+  .toggle { position: relative; width: 44px; height: 24px; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #cbd5e1; border-radius: 24px; transition: 0.3s; }
+  .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+  input:checked + .slider { background: #6366f1; }
+  input:checked + .slider:before { transform: translateX(20px); }
+  .main { padding: 24px 30px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi-card { background: white; border-radius: 12px; padding: 18px 20px; border-left: 4px solid #6366f1; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .kpi-card.green { border-color: #22c55e; }
+  .kpi-card.red { border-color: #ef4444; }
+  .kpi-card.blue { border-color: #3b82f6; }
+  .kpi-card.purple { border-color: #a855f7; }
+  .kpi-label { font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .kpi-value { font-size: 1.6rem; font-weight: 700; margin-top: 4px; color: #1a1a2e; }
+  .kpi-value.negative { color: #ef4444; }
+  .kpi-value.positive { color: #22c55e; }
+  .charts-row { display: grid; grid-template-columns: 3fr 2fr; gap: 16px; margin-bottom: 24px; }
+  .charts-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .chart-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .chart-card h3 { font-size: 0.85rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
+  .chart-container { position: relative; }
+  .pl-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 24px; }
+  .pl-card h3 { font-size: 0.85rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
+  .pl-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .pl-table th { text-align: left; padding: 8px 12px; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px; }
+  .pl-table th:not(:first-child) { text-align: right; }
+  .pl-table td { padding: 7px 12px; border-bottom: 1px solid #f1f5f9; }
+  .pl-table td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+  .pl-table tr.section-header { background: #f8fafc; cursor: pointer; user-select: none; }
+  .pl-table tr.section-header td { font-weight: 700; color: #1a1a2e; font-size: 0.85rem; }
+  .pl-table tr.section-header:hover { background: #f1f5f9; }
+  .pl-table tr.sub-row td:first-child { padding-left: 28px; color: #475569; }
+  .pl-table tr.sub-sub-row td:first-child { padding-left: 48px; color: #64748b; font-size: 0.82rem; }
+  .pl-table tr.total-row td { font-weight: 700; border-top: 2px solid #e2e8f0; background: #f8fafc; }
+  .pl-table tr.grand-total td { font-weight: 800; font-size: 0.9rem; border-top: 3px double #1a1a2e; color: #1a1a2e; }
+  .pl-table tr.collapsible { transition: display 0.2s; }
+  .pl-table .negative { color: #ef4444; }
+  .pl-table .positive { color: #22c55e; }
+  .expand-icon { margin-right: 6px; display: inline-block; transition: transform 0.2s; font-size: 0.7rem; }
+  .collapsed .expand-icon { transform: rotate(-90deg); }
+  .qbo-link { cursor: pointer; }
+  .qbo-link:hover { text-decoration: underline; color: #6366f1; }
+  .cf-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 24px; }
+  .cf-card h3 { font-size: 0.85rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
+  .cf-grid { display: grid; grid-template-columns: repeat(3, 1fr) 1px repeat(2, 1fr); gap: 0; }
+  .cf-item { padding: 16px 20px; border-right: 1px solid #f1f5f9; }
+  .cf-divider { background: #e2e8f0; width: 1px; }
+  .cf-item:last-child { border-right: none; }
+  .cf-item-label { font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+  .cf-item-value { font-size: 1.3rem; font-weight: 700; margin-top: 4px; }
+  .cf-item-value.negative { color: #ef4444; }
+  .cf-item-value.positive { color: #22c55e; }
+  .cf-sep { border-top: 2px solid #e2e8f0; margin: 16px 0; }
+  .footer { text-align: center; padding: 20px; font-size: 0.75rem; color: #94a3b8; }
+  .hidden { display: none; }
+  @media (max-width: 900px) {
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .charts-row, .charts-row-2 { grid-template-columns: 1fr; }
+    .cf-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>ð  Tom Family Financial Dashboard</h1>
+    <div class="subtitle">Personal Life Â· QuickBooks Online</div>
+  </div>
+  <div class="updated">Updated: April 6, 2026</div>
+</div>
+
+<div class="controls">
+  <label>From:
+    <select id="startMonth" onchange="updateDashboard()">
+      <option value="0">Jan 2026</option>
+      <option value="1">Feb 2026</option>
+      <option value="2">Mar 2026</option>
+      <option value="3">Apr 2026</option>
+    </select>
+  </label>
+  <label>To:
+    <select id="endMonth" onchange="updateDashboard()">
+      <option value="0">Jan 2026</option>
+      <option value="1">Feb 2026</option>
+      <option value="2">Mar 2026</option>
+      <option value="3" selected>Apr 2026</option>
+    </select>
+  </label>
+  <div class="toggle-wrap">
+    <span class="toggle-label">Investment Properties</span>
+    <label class="toggle">
+      <input type="checkbox" id="investToggle" checked onchange="updateDashboard()">
+      <span class="slider"></span>
+    </label>
+  </div>
+</div>
+
+<div class="main">
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card green">
+      <div class="kpi-label">Total Income</div>
+      <div class="kpi-value" id="kpiIncome">â</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Total Expenses</div>
+      <div class="kpi-value" id="kpiExpenses">â</div>
+    </div>
+    <div class="kpi-card" id="kpiNetCard">
+      <div class="kpi-label">Net Income</div>
+      <div class="kpi-value" id="kpiNet">â</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Cash at End of Period</div>
+      <div class="kpi-value" id="kpiCash">$282,305.77</div>
+    </div>
+  </div>
+
+  <!-- Charts Row 1 -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>Monthly Income vs. Expenses</h3>
+      <div class="chart-container" style="height:260px">
+        <canvas id="barChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Cumulative Net Income</h3>
+      <div class="chart-container" style="height:260px">
+        <canvas id="lineChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row 2 -->
+  <div class="charts-row-2">
+    <div class="chart-card">
+      <h3>Expense Breakdown (Personal)</h3>
+      <div class="chart-container" style="height:280px">
+        <canvas id="expensePieChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Income by Source</h3>
+      <div class="chart-container" style="height:280px">
+        <canvas id="incomePieChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- P&L Table -->
+  <div class="pl-card">
+    <h3>Profit &amp; Loss â Detail View <span style="font-size:0.75rem;color:#94a3b8;font-weight:400;text-transform:none;">(double-click row to open in QuickBooks)</span></h3>
+    <div style="overflow-x:auto">
+      <table class="pl-table" id="plTable">
+        <thead id="plHead"></thead>
+        <tbody id="plBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Cash Flow -->
+  <div class="cf-card">
+    <h3>Statement of Cash Flows â Jan 1 â Apr 6, 2026</h3>
+    <div class="cf-grid">
+      <div class="cf-item">
+        <div class="cf-item-label">Operating Activities</div>
+        <div class="cf-item-value negative">-$9,123.90</div>
+      </div>
+      <div class="cf-item">
+        <div class="cf-item-label">Investing Activities</div>
+        <div class="cf-item-value">$0.00</div>
+      </div>
+      <div class="cf-item">
+        <div class="cf-item-label">Financing Activities</div>
+        <div class="cf-item-value positive">$291,321.67</div>
+      </div>
+      <div class="cf-divider"></div>
+      <div class="cf-item">
+        <div class="cf-item-label">Net Cash Increase</div>
+        <div class="cf-item-value positive">$282,197.77</div>
+      </div>
+      <div class="cf-item">
+        <div class="cf-item-label">Cash at Beginning</div>
+        <div class="cf-item-value">$108.00</div>
+      </div>
+      <div class="cf-item">
+        <div class="cf-item-label">Cash at End of Period</div>
+        <div class="cf-item-value positive">$282,305.77</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">Tom Family Financial Dashboard Â· Data from QuickBooks Online (Personal Life) Â· Generated April 6, 2026</div>
+
+<script>
+// âââââââââââââââââââââââââââââââââââââââââ
+// DATA
+// âââââââââââââââââââââââââââââââââââââââââ
+const months = ['Jan 2026', 'Feb 2026', 'Mar 2026', 'Apr 2026'];
+const periods = [
+  { start: '2026-01-01', end: '2026-01-31' },
+  { start: '2026-02-01', end: '2026-02-28' },
+  { start: '2026-03-01', end: '2026-03-31' },
+  { start: '2026-04-01', end: '2026-04-06' },
+];
+
+const rawData = [
+  // Jan 2026
+  {
+    income: {
+      '3001 W2 Income': 7948.39,
+      '3002 Side Work Income': 2157.06,
+      '3003 Interest Income': 642.99,
+      '3004 Rental Property Income': 6722.32,
+      '3006 Gifts from Others': 482.00,
+    },
+    personalExp: {
+      '4001 Food': { '4001.01 Eating Out': 123.93, '4001.02 Groceries': 721.63 },
+      '4002 Medical': 297.75,
+      '4003 Automotive': { '4003.01 Gas & Fuel': 227.97, '4003.03 Vehicle Insurance': 174.00 },
+      '4005 Entertainment': 45.97,
+      '4007 Clothing / Home / Misc': 142.38,
+      '4009 Gifts': 20.00,
+      '4011 Childcare': 337.50,
+    },
+    investExp: {
+      '5001 Mortgages': { '5001.01 Principal Paydown': 8278.80, '5001.02 Mortgage Interest': 337.50 },
+      '5002 Property Insurance': 98.83,
+      '5004 Maintenance': 13173.33,
+      '5005 Utilities': 346.85,
+    },
+  },
+  // Feb 2026
+  {
+    income: {
+      '3001 W2 Income': 7948.40,
+      '3002 Side Work Income': 1741.59,
+      '3003 Interest Income': 524.21,
+      '3004 Rental Property Income': 7854.22,
+    },
+    personalExp: {
+      '4001 Food': { '4001.01 Eating Out': 137.98, '4001.02 Groceries': 667.02 },
+      '4002 Medical': 647.06,
+      '4003 Automotive': { '4003.01 Gas & Fuel': 208.07, '4003.02 Vehicle Maintenance': 150.54, '4003.03 Vehicle Insurance': 395.04 },
+      '4005 Entertainment': 191.80,
+      '4007 Clothing / Home / Misc': 139.48,
+      '4008 Travel': 90.66,
+      '4009 Gifts': 143.45,
+    },
+    investExp: {
+      '5001 Mortgages': { '5001.01 Principal Paydown': 4336.70, '5001.02 Mortgage Interest': 187.50 },
+      '5002 Property Insurance': 98.83,
+      '5003 Property Taxes': 4123.26,
+      '5004 Maintenance': 17528.72,
+      '5005 Utilities': 2666.77,
+    },
+  },
+  // Mar 2026
+  {
+    income: {
+      '3001 W2 Income': 7948.40,
+      '3002 Side Work Income': 2872.60,
+      '3003 Interest Income': 506.53,
+      '3004 Rental Property Income': 5164.56,
+      '3005 Additional Taxes Owed': -801.64,
+      '3006 Gifts from Others': 1247.00,
+    },
+    personalExp: {
+      '4001 Food': { '4001.01 Eating Out': 128.40, '4001.02 Groceries': 715.12 },
+      '4002 Medical': 292.41,
+      '4003 Automotive': { '4003.01 Gas & Fuel': 358.37, '4003.02 Vehicle Maintenance': 1412.58 },
+      '4005 Entertainment': 21.99,
+      '4007 Clothing / Home / Misc': 111.83,
+      '4008 Travel': -326.17,
+      '4009 Gifts': 43.99,
+      '4011 Childcare': 61.25,
+    },
+    investExp: {
+      '5001 Mortgages': { '5001.01 Principal Paydown': 1108.53, '5001.02 Mortgage Interest': 337.50 },
+      '5002 Property Insurance': 98.83,
+      '5004 Maintenance': 14.80,
+      '5005 Utilities': 2456.61,
+    },
+  },
+  // Apr 2026 (Apr 1â6)
+  {
+    income: {
+      '3001 W2 Income': 3980.78,
+    },
+    personalExp: {},
+    investExp: {
+      '5001 Mortgages': { '5001.01 Principal Paydown': 1842.85, '5001.02 Mortgage Interest': 2514.24 },
+      '5002 Property Insurance': 98.83,
+      '5004 Maintenance': 3000.00,
+      '5005 Utilities': 284.68,
+    },
+  },
+];
+
+// Chart instances
+let barChart, lineChart, expPieChart, incPieChart;
+
+// âââââââââââââââââââââââââââââââââââââââââ
+// HELPERS
+// âââââââââââââââââââââââââââââââââââââââââ
+const fmt = (v) => {
+  if (v === 0) return 'â';
+  const abs = Math.abs(v);
+  const str = abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return v < 0 ? `-$${str}` : `$${str}`;
+};
+
+const sumObj = (obj) => {
+  if (typeof obj === 'number') return obj;
+  return Object.values(obj).reduce((a, v) => a + (typeof v === 'object' ? sumObj(v) : v), 0);
+};
+
+function getFilteredData() {
+  const s = parseInt(document.getElementById('startMonth').value);
+  const e = parseInt(document.getElementById('endMonth').value);
+  const start = Math.min(s, e);
+  const end = Math.max(s, e);
+  return rawData.slice(start, end + 1).map((d, i) => ({ ...d, monthIdx: start + i }));
+}
+
+function showInvest() {
+  return document.getElementById('investToggle').checked;
+}
+
+// âââââââââââââââââââââââââââââââââââââââââ
+// MAIN UPDATE
+// âââââââââââââââââââââââââââââââââââââââââ
+function updateDashboard() {
+  const data = getFilteredData();
+  const invest = showInvest();
+
+  updateKPIs(data, invest);
+  updateBarChart(data, invest);
+  updateLineChart(data, invest);
+  updateExpPie(data);
+  updateIncPie(data, invest);
+  buildPLTable(data, invest);
+}
+
+// âââââââââââââââââââââââââââââââââââââââââ
+// KPIs
+// âââââââââââââââââââââââââââââââââââââââââ
+function updateKPIs(data, invest) {
+  let totalIncome = 0, totalExpenses = 0;
+  data.forEach(d => {
+    let inc = sumObj(d.income);
+    if (!invest) inc -= (d.income['3004 Rental Property Income'] || 0);
+    let exp = sumObj(d.personalExp);
+    if (invest) exp += sumObj(d.investExp);
+    totalIncome += inc;
+    totalExpenses += exp;
+  });
+  const net = totalIncome - totalExpenses;
+  document.getElementById('kpiIncome').textContent = fmt(totalIncome);
+  document.getElementById('kpiExpenses').textContent = fmt(totalExpenses);
+  const netEl = document.getElementById('kpiNet');
+  netEl.textContent = fmt(net);
+  netEl.className = 'kpi-value ' + (net >= 0 ? 'positive' : 'negative');
+  const card = document.getElementById('kpiNetCard');
+  card.className = 'kpi-card ' + (net >= 0 ? 'green' : 'red');
+}
+
+// âââââââââââââââââââââââââââââââââââââââââ
+// BAR CHART
+// âââââââââââââââââââââââââââââââââââââââââ
+function updateBarChart(data, invest) {
+  const labels = data.map(d => months[d.monthIdx]);
+  const incomes = data.map(d => {
+    let v = sumObj(d.income);
+    if (!invest) v -= (d.income['3004 Rental Property Income'] || 0);
+    return Math.max(0, v);
+  });
+  const expenses = data.map(d => {
+    let v = sumObj(d.personalExp);
+    if (invest) v += sumObj(d.investExp);
+    return Math.max(0, v);
+  });
+
+  if (barChart) barChart.destroy();
+  const ctx = document.getElementById('barChart').getContext('2d');
+  barChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Income', data: incomes, backgroundColor: 'rgba(34,197,94,0.8)', borderRadius: 5 },
+        { label: 'Expenses', data: expenses, backgroundColor: 'rgba(239,68,68,0.8)', borderRadius: 5 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k', font: { size: 10 } }, grid: { color: '#f1f5f9' } }
+      }
+    }
+  });
+}
+
+// âââââââââââââââââââââââââââââââââââââââââ
+// LINE CHART
+// âââââââââââââââââââââââââââââââââââââââââ
+function updateLineChart(data, invest) {
+  const labels = data.map(d => months[d.monthIdx]);
+  let cumulative = 0;
+  const netVals = data.map(d => {
+    let inc = sumObj(d.income);
+    if (!invest) inc -= (d.income['3004 Rental Property Income'] || 0);
+    let exp = sumObj(d.personalExp);
+    if (invest) exp += sumObj(d.investExp);
+    cumulative += (inc - exp);
+    return parseFloat(cumulative.toFixed(2));
+  });
+
+  if (lineChart) lineChart.destroy();
+  const ctx = document.getElementById('lineChart').getContext('2d');
+  lineChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Cumulative Net',
+        data: netVals,
+        borderColor: '#6366f1',
+        backgroundColor: 'rgba(99,102,241,0.08)',
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#6366f1',
+        pointRadius: 5,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false } },
+        y: {
+          ticks: { callback: v => (v >= 0 ? '$' : '-$') + Math.abs(v/1000).toFixed(0) + 'k', font: { size: 10 } },
+          grid: { color: '#f1f5f9' }
+        }
+      }
+    }
+  });
+}
+
+// âââââââââââââââââââââââââââââââââââââââââ
+// EXPENSE PIE (personal only)
+// âââââââââââââââââââââââââââââââââââââââââ
+function updateExpPie(data) {
+  const totals = {};
+  data.forEach(d => {
+    Object.entries(d.personalExp).forEach(([k, v]) => {
+      const amt = typeof v === 'object' ? sumObj(v) : v;
+      if (amt > 0) totals[k] = (totals[k] || 0) + amt;
+    });
+  });
+  const entries = Object.entries(totals).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]);
+  const labels = entries.map(([k]) => k);
+  const values = entries.map(([,v]) => v);
+  const total = values.reduce((a,b) => a+b, 0);
+  const colors = ['#6366f1','#3b82f6','#22c55e','#f59e0b','#ef4444','#a855f7','#06b6d4','#ec4899','#14b8a6','#f97316'];
+
+  if (expPieChart) expPieChart.destroy();
+  const ctx = document.getElementById('expensePieChart').getContext('2d');
+  expPieChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderWidth: 2, borderColor: '#fff' }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          maxWidth: 280,
+          labels: {
+            font: { size: 11 },
+            generateLabels: (chart) => {
+              const d = chart.data;
+              return d.labels.map((label, i) => {
+                const val = d.datasets[0].data[i];
+                const pct = ((val / total) * 100).toFixed(1);
+                return { text: `${label} (${pct}%)`, fillStyle: d.datasets[0].backgroundColor[i], index: i };
+              });
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const pct = ((ctx.parsed / total) * 100).toFixed(1);
+              return ` ${fmt(ctx.parsed)} (${pct}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// âââââââââââââââââââââââââââââââââââââââââ
+// INCOME PIE
+// âââââââââââââââââââââââââââââââââââââââââ
+function updateIncPie(data, invest) {
+  const totals = {};
+  data.forEach(d => {
+    Object.entries(d.income).forEach(([k, v]) => {
+      if (!invest && k === '3004 Rental Property Income') return;
+      if (v > 0) totals[k] = (totals[k] || 0) + v;
+    });
+  });
+  const entries = Object.entries(totals).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]);
+  const labels = entries.map(([k]) => k);
+  const values = entries.map(([,v]) => v);
+  const total = values.reduce((a,b) => a+b, 0);
+  const colors = ['#22c55e','#6366f1','#3b82f6','#f59e0b','#a855f7','#06b6d4'];
+
+  if (incPieChart) incPieChart.destroy();
+  const ctx = document.getElementById('incomePieChart').getContext('2d');
+  incPieChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderWidth: 2, borderColor: '#fff' }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          maxWidth: 280,
+          labels: {
+            font: { size: 11 },
+            generateLabels: (chart) => {
+              const d = chart.data;
+              return d.labels.map((label, i) => {
+                const val = d.datasets[0].data[i];
+                const pct = ((val / total) * 100).toFixed(1);
+                return { text: `${label} (${pct}%)`, fillStyle: d.datasets[0].backgroundColor[i], index: i };
+              });
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const pct = ((ctx.parsed / total) * 100).toFixed(1);
+              return ` ${fmt(ctx.parsed)} (${pct}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// âââââââââââââââââââââââââââââââââââââââââ
+// P&L TABLE
+// âââââââââââââââââââââââââââââââââââââââââ
+function buildPLTable(data, invest) {
+  const head = document.getElementById('plHead');
+  const body = document.getElementById('plBody');
+  const mLabels = data.map(d => months[d.monthIdx]);
+  const n = data.length;
+  const showTotal = n > 1;
+
+  // Header
+  head.innerHTML = `<tr>
+    <th style="min-width:220px">Account</th>
+    ${mLabels.map(m => `<th>${m}</th>`).join('')}
+    ${showTotal ? '<th style="border-left:2px solid #e2e8f0">Total</th>' : ''}
+  </tr>`;
+
+  const rows = [];
+  const startIdx = parseInt(document.getElementById('startMonth').value);
+  const endIdx = parseInt(document.getElementById('endMonth').value);
+  const s = Math.min(startIdx, endIdx);
+  const qboStart = periods[s].start;
+  const qboEnd = periods[Math.max(startIdx, endIdx)].end;
+  const qboLink = `https://app.qbo.intuit.com/app/profitandloss?start_date=${qboStart}&end_date=${qboEnd}&column=total`;
+
+  function addRow(cls, label, vals, extra = '') {
+    const totalVal = vals.reduce((a,b) => a+b, 0);
+    const cells = vals.map(v => `<td class="${v < 0 ? 'negative' : ''}">${v !== 0 ? fmt(v) : 'â'}</td>`).join('');
+    const totalCell = showTotal ? `<td class="${totalVal < 0 ? 'negative' : ''}" style="border-left:2px solid #e2e8f0;font-weight:600">${fmt(totalVal)}</td>` : '';
+    rows.push(`<tr class="${cls} qbo-link" ondblclick="window.open('${qboLink}','_blank')" title="Double-click to open in QuickBooks"${extra}><td>${label}</td>${cells}${totalCell}</tr>`);
+  }
+
+  function sectionRows(sectionLabel, sectionKey, cls5000 = false) {
+    // Collect all sub-keys across months
+    const allKeys = new Set();
+    data.forEach(d => {
+      const src = cls5000 ? d.investExp : d.personalExp;
+      Object.keys(src).forEach(k => allKeys.add(k));
+    });
+
+    const sectionTotals = Array(n).fill(0);
+
+    allKeys.forEach(key => {
+      // Check if it's a group
+      const isGroup = data.some(d => {
+        const src = cls5000 ? d.investExp : d.personalExp;
+        return src[key] && typeof src[key] === 'object';
+      });
+
+      const keyVals = data.map(d => {
+        const src = cls5000 ? d.investExp : d.personalExp;
+        if (!src[key]) return 0;
+        return typeof src[key] === 'object' ? sumObj(src[key]) : src[key];
+      });
+      keyVals.forEach((v, i) => sectionTotals[i] += v);
+
+      if (isGroup) {
+        addRow('sub-row section-header', `<span class="expand-icon">â¼</span>${key}`, keyVals, ` data-group="${sectionKey}-${key}"`);
+        // Sub-rows
+        const allSubKeys = new Set();
+        data.forEach(d => {
+          const src = cls5000 ? d.investExp : d.personalExp;
+          if (src[key] && typeof src[key] === 'object') Object.keys(src[key]).forEach(sk => allSubKeys.add(sk));
+        });
+        allSubKeys.forEach(sk => {
+          const skVals = data.map(d => {
+            const src = cls5000 ? d.investExp : d.personalExp;
+            if (!src[key] || typeof src[key] !== 'object') return 0;
+            return src[key][sk] || 0;
+          });
+          if (skVals.some(v => v !== 0)) {
+            addRow(`sub-sub-row collapsible ${sectionKey}-${key}`, sk, skVals);
+          }
+        });
+      } else {
+        if (keyVals.some(v => v !== 0)) addRow('sub-row', key, keyVals);
+      }
+    });
+
+    // Section total
+    const totalCells = sectionTotals.map(v => `<td class="${v<0?'negative':''}" style="font-weight:700">${fmt(v)}</td>`).join('');
+    const grandTotal = sectionTotals.reduce((a,b)=>a+b,0);
+    const totalExtra = showTotal ? `<td style="border-left:2px solid #e2e8f0;font-weight:800">${fmt(grandTotal)}</td>` : '';
+    rows.push(`<tr class="total-row"><td style="padding-left:12px">Total ${sectionLabel}</td>${totalCells}${totalExtra}</tr>`);
+    return sectionTotals;
+  }
+
+  // ââ INCOME ââ
+  const incTotals = Array(n).fill(0);
+  const allIncKeys = new Set();
+  data.forEach(d => Object.keys(d.income).forEach(k => allIncKeys.add(k)));
+
+  // Section header
+  rows.push(`<tr class="section-header" data-group="income-section" onclick="toggleSection('income-section', this)"><td colspan="${n + (showTotal?2:1)}" style="padding:10px 12px"><span class="expand-icon">â¼</span><strong>ð INCOME</strong></td></tr>`);
+
+  allIncKeys.forEach(k => {
+    if (!invest && k === '3004 Rental Property Income') return;
+    const vals = data.map(d => d.income[k] || 0);
+    vals.forEach((v,i) => incTotals[i] += v);
+    if (vals.some(v => v !== 0)) addRow(`sub-row collapsible income-section`, k, vals);
+  });
+  const incTotalCells = incTotals.map(v => `<td style="font-weight:700">${fmt(v)}</td>`).join('');
+  const incGrand = incTotals.reduce((a,b)=>a+b,0);
+  rows.push(`<tr class="total-row"><td style="padding-left:12px">Total Income</td>${incTotalCells}${showTotal?`<td style="border-left:2px solid #e2e8f0;font-weight:800">${fmt(incGrand)}</td>`:''}</tr>`);
+
+  // Spacer
+  rows.push(`<tr><td colspan="${n + (showTotal?2:1)}" style="height:8px;background:#f8fafc"></td></tr>`);
+
+  // ââ PERSONAL EXPENSES ââ
+  rows.push(`<tr class="section-header" data-group="personal-section" onclick="toggleSection('personal-section', this)"><td colspan="${n + (showTotal?2:1)}" style="padding:10px 12px"><span class="expand-icon">â¼</span><strong>ð  PERSONAL EXPENSES (4000s)</strong></td></tr>`);
+  const pTotals = sectionRows('Personal Expenses', 'personal');
+
+  rows.push(`<tr><td colspan="${n + (showTotal?2:1)}" style="height:8px;background:#f8fafc"></td></tr>`);
+
+  // ââ INVESTMENT PROPERTY EXPENSES ââ
+  if (invest) {
+    rows.push(`<tr class="section-header" data-group="invest-section" onclick="toggleSection('invest-section', this)"><td colspan="${n + (showTotal?2:1)}" style="padding:10px 12px"><span class="expand-icon">â¼</span><strong>ð¢ INVESTMENT PROPERTY EXPENSES (5000s)</strong></td></tr>`);
+    const iTotals = sectionRows('Investment Property Expenses', 'invest', true);
+    rows.push(`<tr><td colspan="${n + (showTotal?2:1)}" style="height:8px;background:#f8fafc"></td></tr>`);
+
+    // Grand totals
+    const totalExpArr = pTotals.map((v,i) => v + iTotals[i]);
+    const netArr = incTotals.map((v,i) => v - totalExpArr[i]);
+    const totalExpCells = totalExpArr.map(v => `<td class="${v<0?'negative':''}" style="font-weight:700">${fmt(v)}</td>`).join('');
+    const netCells = netArr.map(v => `<td class="${v<0?'negative':'positive'}" style="font-weight:800">${fmt(v)}</td>`).join('');
+    const totalExpGrand = totalExpArr.reduce((a,b)=>a+b,0);
+    const netGrand = netArr.reduce((a,b)=>a+b,0);
+    rows.push(`<tr class="total-row"><td style="padding-left:12px;font-weight:700">Total Expenses</td>${totalExpCells}${showTotal?`<td style="border-left:2px solid #e2e8f0;font-weight:800">${fmt(totalExpGrand)}</td>`:''}</tr>`);
+    rows.push(`<tr class="grand-total"><td>NET INCOME</td>${netCells}${showTotal?`<td style="border-left:2px solid #e2e8f0">${fmt(netGrand)}</td>`:''}</tr>`);
+  } else {
+    const netArr = incTotals.map((v,i) => v - pTotals[i]);
+    const netCells = netArr.map(v => `<td class="${v<0?'negative':'positive'}" style="font-weight:800">${fmt(v)}</td>`).join('');
+    const netGrand = netArr.reduce((a,b)=>a+b,0);
+    const pTotalCells = pTotals.map(v => `<td style="font-weight:700">${fmt(v)}</td>`).join('');
+    const pGrand = pTotals.reduce((a,b)=>a+b,0);
+    rows.push(`<tr class="total-row"><td style="padding-left:12px;font-weight:700">Total Expenses</td>${pTotalCells}${showTotal?`<td style="border-left:2px solid #e2e8f0;font-weight:800">${fmt(pGrand)}</td>`:''}</tr>`);
+    rows.push(`<tr class="grand-total"><td>NET INCOME</td>${netCells}${showTotal?`<td style="border-left:2px solid #e2e8f0">${fmt(netGrand)}</td>`:''}</tr>`);
+  }
+
+  body.innerHTML = rows.join('');
+
+  // Section toggle click handlers
+  document.querySelectorAll('.section-header[data-group]').forEach(row => {
+    row.addEventListener('click', function() {
+      const group = this.getAttribute('data-group');
+      toggleSection(group, this);
+    });
+  });
+
+  // Sub-group toggles
+  document.querySelectorAll('[data-group]').forEach(row => {
+    if (!row.classList.contains('section-header') || row.tagName !== 'TR') return;
+    row.addEventListener('click', function(e) {
+      const group = this.getAttribute('data-group');
+      const icon = this.querySelector('.expand-icon');
+      const isCollapsed = this.classList.toggle('collapsed');
+      document.querySelectorAll(`.${group}`).forEach(r => r.classList.toggle('hidden', isCollapsed));
+    });
+  });
+}
+
+function toggleSection(group, headerRow) {
+  const icon = headerRow.querySelector('.expand-icon');
+  const isCollapsed = headerRow.classList.toggle('collapsed');
+  document.querySelectorAll(`.${group}`).forEach(r => r.classList.toggle('hidden', isCollapsed));
+}
+
+// Init
+updateDashboard();
+</script>
+</body>
+</html>
