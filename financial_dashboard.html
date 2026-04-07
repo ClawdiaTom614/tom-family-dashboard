@@ -1,611 +1,416 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tom Family Financial Dashboard - 2026</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #f0f2f5;
-  color: #333;
-  line-height: 1.5;
-}
-header {
-  background: linear-gradient(135deg, #1a1a2e, #16213e);
-  color: #fff;
-  padding: 24px 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-header h1 { font-size: 1.5rem; font-weight: 600; }
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.controls label { font-size: 0.85rem; color: #ccc; }
-.controls select {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #444;
-  background: #1e2a45;
-  color: #fff;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-.toggle-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.85rem;
-}
-.toggle-wrap input[type="checkbox"] {
-  width: 18px; height: 18px; cursor: pointer;
-  accent-color: #4ecca3;
-}
-.container { max-width: 1280px; margin: 0 auto; padding: 24px; }
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-}
-.kpi-card {
-  background: #fff;
-  border-radius: 10px;
-  padding: 20px 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  border-left: 4px solid #ccc;
-}
-.kpi-card.income { border-left-color: #27ae60; }
-.kpi-card.expenses { border-left-color: #e74c3c; }
-.kpi-card.net { border-left-color: #2980b9; }
-.kpi-card.cash { border-left-color: #8e44ad; }
-.kpi-label { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-.kpi-value { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-.kpi-value.positive { color: #27ae60; }
-.kpi-value.negative { color: #e74c3c; }
-.chart-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 24px;
-}
-.chart-card {
-  background: #fff;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-.chart-card h3 { font-size: 1rem; margin-bottom: 12px; color: #444; }
-.chart-card canvas { max-height: 320px; }
-.pl-card {
-  background: #fff;
-  border-radius: 10px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  margin-bottom: 24px;
-  overflow-x: auto;
-}
-.pl-card h3 { font-size: 1.1rem; margin-bottom: 16px; color: #444; }
-table.pl-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-variant-numeric: tabular-nums;
-  font-size: 0.88rem;
-}
-table.pl-table th, table.pl-table td {
-  padding: 8px 12px;
-  text-align: right;
-  border-bottom: 1px solid #eee;
-}
-table.pl-table th:first-child, table.pl-table td:first-child { text-align: left; }
-table.pl-table th { background: #f7f8fa; font-weight: 600; color: #555; position: sticky; top: 0; }
-tr.section-header td {
-  background: #f0f1f3;
-  font-weight: 700;
-  cursor: pointer;
-  user-select: none;
-}
-tr.section-header td:first-child { padding-left: 8px; }
-tr.section-header:hover td { background: #e4e6ea; }
-tr.child-row td:first-child { padding-left: 28px; }
-tr.total-row td { font-weight: 700; border-top: 2px solid #ccc; }
-tr.net-row td { font-weight: 700; border-top: 3px double #333; font-size: 0.95rem; }
-tr.clickable { cursor: pointer; }
-tr.clickable:hover td { background: #f5f8ff; }
-.cf-card {
-  background: #fff;
-  border-radius: 10px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  margin-bottom: 24px;
-}
-.cf-card h3 { font-size: 1.1rem; margin-bottom: 16px; color: #444; }
-table.cf-table {
-  width: 100%; max-width: 500px;
-  border-collapse: collapse;
-  font-variant-numeric: tabular-nums;
-  font-size: 0.9rem;
-}
-table.cf-table td { padding: 8px 12px; border-bottom: 1px solid #eee; }
-table.cf-table td:last-child { text-align: right; font-weight: 600; }
-table.cf-table tr.cf-total td { font-weight: 700; border-top: 2px solid #999; }
-@media (max-width: 900px) {
-  .kpi-grid { grid-template-columns: 1fr 1fr; }
-  .chart-grid { grid-template-columns: 1fr; }
-  header { flex-direction: column; align-items: flex-start; }
-}
-@media (max-width: 500px) {
-  .kpi-grid { grid-template-columns: 1fr; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tom Family Financial Dashboard — 2026</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #333; }
+    header {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      color: white; padding: 24px 32px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    }
+    header h1 { font-size: 1.5rem; font-weight: 600; }
+    header .subtitle { font-size: 0.85rem; opacity: 0.7; margin-top: 4px; }
+    .controls { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .controls label { font-size: 0.85rem; opacity: 0.85; }
+    .controls select {
+      background: rgba(255,255,255,0.15); color: white;
+      border: 1px solid rgba(255,255,255,0.3); border-radius: 6px;
+      padding: 6px 10px; font-size: 0.85rem;
+    }
+    .controls select option { background: #16213e; }
+    .toggle-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.85rem; opacity: 0.85; }
+    .toggle-btn input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+    main { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .kpi-card {
+      background: white; border-radius: 10px; padding: 20px;
+      border-left: 4px solid #ccc; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .kpi-card.income   { border-color: #22c55e; }
+    .kpi-card.expenses { border-color: #ef4444; }
+    .kpi-card.net      { border-color: #3b82f6; }
+    .kpi-card.cash     { border-color: #a855f7; }
+    .kpi-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #888; margin-bottom: 8px; }
+    .kpi-value { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .kpi-card.income   .kpi-value { color: #22c55e; }
+    .kpi-card.expenses .kpi-value { color: #ef4444; }
+    .kpi-card.cash     .kpi-value { color: #a855f7; }
+    .pos { color: #22c55e; } .neg { color: #ef4444; }
+    .chart-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+    .chart-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .chart-card h3 { font-size: 0.9rem; font-weight: 600; color: #555; margin-bottom: 16px; }
+    .chart-card canvas { max-height: 260px; }
+    .table-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; overflow-x: auto; }
+    .table-card h3 { font-size: 0.9rem; font-weight: 600; color: #555; margin-bottom: 4px; }
+    .date-note { font-size: 0.75rem; color: #aaa; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; font-variant-numeric: tabular-nums; }
+    th {
+      background: #f8f9fa; padding: 10px 12px; text-align: right;
+      font-weight: 600; color: #555; border-bottom: 2px solid #e5e7eb;
+      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    th:first-child { text-align: left; }
+    td { padding: 8px 12px; text-align: right; border-bottom: 1px solid #f3f4f6; color: #444; }
+    td:first-child { text-align: left; }
+    tr.sec-hdr td { background: #f8f9fa; font-weight: 700; color: #333; cursor: pointer; }
+    tr.sec-hdr td:first-child::before { content: '\25BC  '; font-size: 0.7em; }
+    tr.sec-hdr.collapsed td:first-child::before { content: '\25B6  '; }
+    tr.sec-total td { background: #f0f9ff; font-weight: 700; border-top: 2px solid #e0f2fe; }
+    tr.grand-total td { background: #1e3a5f; color: white; font-weight: 700; font-size: 0.95rem; }
+    tr.sub-row td:first-child { padding-left: 28px; }
+    tr:not(.sec-hdr):not(.sec-total):not(.grand-total):hover { background: #f9fafb; }
+    tr.hidden-row { display: none; }
+    .cf-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; }
+    .cf-card h3 { font-size: 0.9rem; font-weight: 600; color: #555; margin-bottom: 16px; }
+    .cf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+    .cf-item { background: #f8f9fa; border-radius: 8px; padding: 16px; text-align: center; }
+    .cf-lbl { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #888; margin-bottom: 8px; }
+    .cf-val { font-size: 1.2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .cf-summary { display: flex; gap: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
+    .cf-sum-item { flex: 1; text-align: center; }
+    .cf-sum-item .cf-val { font-size: 1.1rem; color: #a855f7; }
+    @media (max-width: 900px) {
+      main { padding: 16px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .chart-grid { grid-template-columns: 1fr; }
+      .cf-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-
 <header>
-  <h1>Tom Family Financial Dashboard &mdash; 2026</h1>
+  <div>
+    <h1>Tom Family Financial Dashboard &mdash; 2026</h1>
+    <div class="subtitle">Personal Life &middot; QuickBooks Online &middot; Generated April 6, 2026</div>
+  </div>
   <div class="controls">
-    <div>
-      <label>Start</label>
-      <select id="startMonth">
+    <label>From
+      <select id="startMonth" onchange="update()">
         <option value="0">Jan 2026</option>
         <option value="1">Feb 2026</option>
         <option value="2">Mar 2026</option>
         <option value="3">Apr 2026</option>
       </select>
-    </div>
-    <div>
-      <label>End</label>
-      <select id="endMonth">
+    </label>
+    <label>To
+      <select id="endMonth" onchange="update()">
         <option value="0">Jan 2026</option>
         <option value="1">Feb 2026</option>
         <option value="2">Mar 2026</option>
         <option value="3" selected>Apr 2026</option>
       </select>
-    </div>
-    <div class="toggle-wrap">
-      <input type="checkbox" id="investToggle" checked>
-      <label for="investToggle">Investment Properties</label>
-    </div>
+    </label>
+    <label class="toggle-btn">
+      <input type="checkbox" id="investToggle" checked onchange="update()">
+      Investment Properties
+    </label>
   </div>
 </header>
-
-<div class="container">
+<main>
   <div class="kpi-grid">
-    <div class="kpi-card income">
-      <div class="kpi-label">Total Income</div>
-      <div class="kpi-value" id="kpiIncome">--</div>
-    </div>
-    <div class="kpi-card expenses">
-      <div class="kpi-label">Total Expenses</div>
-      <div class="kpi-value" id="kpiExpenses">--</div>
-    </div>
-    <div class="kpi-card net">
-      <div class="kpi-label">Net Income</div>
-      <div class="kpi-value" id="kpiNet">--</div>
-    </div>
-    <div class="kpi-card cash">
-      <div class="kpi-label">Cash at End of Period</div>
-      <div class="kpi-value" id="kpiCash">--</div>
-    </div>
+    <div class="kpi-card income">  <div class="kpi-label">Total Income</div>   <div class="kpi-value" id="kpiIncome">—</div></div>
+    <div class="kpi-card expenses"><div class="kpi-label">Total Expenses</div> <div class="kpi-value" id="kpiExpenses">—</div></div>
+    <div class="kpi-card net">     <div class="kpi-label">Net Income</div>     <div class="kpi-value" id="kpiNet">—</div></div>
+    <div class="kpi-card cash">    <div class="kpi-label">Cash at End of Period</div><div class="kpi-value">$282,305.77</div></div>
   </div>
-
   <div class="chart-grid">
     <div class="chart-card"><h3>Monthly Income vs. Expenses</h3><canvas id="barChart"></canvas></div>
     <div class="chart-card"><h3>Cumulative Net Income</h3><canvas id="lineChart"></canvas></div>
-    <div class="chart-card"><h3>Personal Expenses by Category</h3><canvas id="expPie"></canvas></div>
-    <div class="chart-card"><h3>Income by Source</h3><canvas id="incPie"></canvas></div>
   </div>
-
-  <div class="pl-card">
-    <h3>Profit &amp; Loss Statement</h3>
-    <table class="pl-table" id="plTable"></table>
+  <div class="chart-grid">
+    <div class="chart-card"><h3>Expense Breakdown (Personal 4000s)</h3><canvas id="expensePie"></canvas></div>
+    <div class="chart-card"><h3>Income by Source</h3><canvas id="incomePie"></canvas></div>
   </div>
-
+  <div class="table-card">
+    <h3>Profit &amp; Loss &mdash; <span id="tableTitle"></span></h3>
+    <div class="date-note">Double-click any row to open in QuickBooks Online</div>
+    <table><thead id="plHead"></thead><tbody id="plBody"></tbody></table>
+  </div>
   <div class="cf-card">
-    <h3>Cash Flow Statement (Jan 1 &ndash; Apr 6, 2026)</h3>
-    <table class="cf-table">
-      <tr><td>Operating Activities</td><td id="cfOp"></td></tr>
-      <tr><td>Investing Activities</td><td id="cfInv"></td></tr>
-      <tr><td>Financing Activities</td><td id="cfFin"></td></tr>
-      <tr class="cf-total"><td>Net Increase in Cash</td><td id="cfNet"></td></tr>
-      <tr><td>Cash at Beginning</td><td id="cfBeg"></td></tr>
-      <tr class="cf-total"><td>Cash at End of Period</td><td id="cfEnd"></td></tr>
-    </table>
+    <h3>Statement of Cash Flows &mdash; Jan 1&ndash;Apr 6, 2026</h3>
+    <div class="cf-grid">
+      <div class="cf-item"><div class="cf-lbl">Operating Activities</div><div class="cf-val neg">-$9,123.90</div></div>
+      <div class="cf-item"><div class="cf-lbl">Investing Activities</div><div class="cf-val">$0.00</div></div>
+      <div class="cf-item"><div class="cf-lbl">Financing Activities</div><div class="cf-val pos">$291,321.67</div></div>
+    </div>
+    <div class="cf-summary">
+      <div class="cf-sum-item"><div class="cf-lbl">Cash at Beginning</div><div class="cf-val">$108.00</div></div>
+      <div class="cf-sum-item"><div class="cf-lbl">Net Cash Increase</div><div class="cf-val">$282,197.77</div></div>
+      <div class="cf-sum-item"><div class="cf-lbl">Cash at End of Period</div><div class="cf-val">$282,305.77</div></div>
+    </div>
   </div>
-</div>
-
+</main>
 <script>
-// --- DATA ----------------------------------------------------------------
-var months = ['Jan 2026','Feb 2026','Mar 2026','Apr 2026'];
-var monthDates = [
-  {start:'2026-01-01',end:'2026-01-31'},
-  {start:'2026-02-01',end:'2026-02-28'},
-  {start:'2026-03-01',end:'2026-03-31'},
-  {start:'2026-04-01',end:'2026-04-06'}
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const MONTHS = [
+  { label:'Jan 2026', start:'2026-01-01', end:'2026-01-31' },
+  { label:'Feb 2026', start:'2026-02-01', end:'2026-02-28' },
+  { label:'Mar 2026', start:'2026-03-01', end:'2026-03-31' },
+  { label:'Apr 2026', start:'2026-04-01', end:'2026-04-06' },
 ];
 
-var incomeAccounts = [
-  {code:'3001',name:'W2 Income',              values:[7948.39, 7948.40, 7948.40, 3980.78]},
-  {code:'3002',name:'Side Work Income',       values:[2157.06, 1741.59, 2872.60, 0]},
-  {code:'3003',name:'Interest Income',        values:[642.99, 524.21, 506.53, 0]},
-  {code:'3004',name:'Rental Property Income', values:[6722.32, 7854.22, 5164.56, 0]},
-  {code:'3005',name:'Additional Taxes Owed',  values:[0, 0, -801.64, 0]},
-  {code:'3006',name:'Gifts from Others',      values:[482.00, 0, 1247.00, 0]}
+// Income by month
+const INC = [
+  { '3001':7948.39, '3002':2157.06, '3003':642.99,  '3004':6722.32, '3005':0,       '3006':482.00  }, // Jan
+  { '3001':7948.40, '3002':1741.59, '3003':524.21,  '3004':7854.22, '3005':0,       '3006':0       }, // Feb
+  { '3001':7948.40, '3002':2872.60, '3003':506.53,  '3004':5164.56, '3005':-801.64, '3006':1247.00 }, // Mar
+  { '3001':3980.78, '3002':0,       '3003':0,        '3004':0,       '3005':0,       '3006':0       }, // Apr
 ];
 
-var personalExpenses = [
-  {code:'4001',name:'Groceries',               values:[721.63, 667.02, 715.12, 0]},
-  {code:'4002',name:'Dining Out',              values:[7123.93, 137.98, 128.40, 0]},
-  {code:'4003',name:'Entertainment',           values:[45.97, 191.80, 21.99, 0]},
-  {code:'4004',name:'Home',                    values:[0, 0, 0, 0]},
-  {code:'4005',name:'Medical',                 values:[297.75, 647.06, 292.41, 0]},
-  {code:'4006',name:'Personal Care / Clothing',values:[0, 0, 0, 0]},
-  {code:'4007',name:'Subscriptions',           values:[0, 0, 0, 0]},
-  {code:'4008',name:'Transportation',          values:[403.32, 753.65, 1778.00, 1.85]},
-  {code:'4009',name:'Travel',                  values:[0, 90.66, -326.17, 0]},
-  {code:'4010',name:'Utilities',               values:[0, 0, 0, 0]},
-  {code:'4011',name:'Kids',                    values:[337.50, 0, 61.25, 0]},
-  {code:'4012',name:'Pets',                    values:[0, 0, 0, 0]},
-  {code:'4013',name:'Taxes',                   values:[0, 0, 0, 0]},
-  {code:'4014',name:'Misc. Expenses',          values:[162.38, 282.93, -10.18, 0]}
+// Personal expenses (4000s) — Other Expenses (parking, OEM) folded into 4008/4014
+const PERS = [
+  // Jan: 4008 includes +1.35 parking tolls
+  { '4001':721.63,'4002':123.93,'4003':45.97, '4004':0,'4005':297.75,'4006':0,'4007':0,'4008':403.32,'4009':0,      '4010':0,'4011':337.50,'4012':0,'4013':0,'4014':162.38 },
+  // Feb: no Other Expenses
+  { '4001':667.02,'4002':137.98,'4003':191.80,'4004':0,'4005':647.06,'4006':0,'4007':0,'4008':753.65,'4009':90.66,  '4010':0,'4011':0,    '4012':0,'4013':0,'4014':282.93 },
+  // Mar: 4008 includes +7.05 parking; 4014 includes -165.00 OEM pass-through
+  { '4001':715.12,'4002':128.40,'4003':21.99, '4004':0,'4005':292.41,'4006':0,'4007':0,'4008':1778.00,'4009':-326.17,'4010':0,'4011':61.25,'4012':0,'4013':0,'4014':-9.18 },
+  // Apr: 4008 includes +1.85 parking tolls
+  { '4001':0,    '4002':0,     '4003':0,     '4004':0,'4005':0,     '4006':0,'4007':0,'4008':1.85,  '4009':0,      '4010':0,'4011':0,    '4012':0,'4013':0,'4014':0     },
 ];
 
-var investExpenses = [
-  {code:'5001',name:'Mortgage / Rent',         values:[8616.30, 4524.20, 1446.03, 4507.09]},
-  {code:'5002',name:'Property Tax',            values:[0, 4123.26, 0, 0]},
-  {code:'5003',name:'Insurance',               values:[98.83, 98.83, 98.83, 98.83]},
-  {code:'5004',name:'Repairs & Maintenance',   values:[13173.33, 17528.72, 14.80, 3000.00]},
-  {code:'5005',name:'Property Management',     values:[0, 0, 0, 0]},
-  {code:'5006',name:'Utilities',               values:[346.85, 2666.77, 2456.61, 284.68]},
-  {code:'5007',name:'HOA Fees',                values:[0, 0, 0, 0]},
-  {code:'5008',name:'Landscaping',             values:[0, 0, 0, 0]},
-  {code:'5009',name:'Vacancy / Turnover',      values:[0, 0, 0, 0]},
-  {code:'5010',name:'Misc. Property Expenses', values:[0, 0, 77.41, 0]}
+// Investment property expenses (5000s)
+const INVEST = [
+  { '5001':8616.30,'5002':0,       '5003':98.83,'5004':13173.33,'5005':0,'5006':346.85, '5007':0,'5008':0,'5009':0,'5010':0     }, // Jan
+  { '5001':4524.20,'5002':4123.26, '5003':98.83,'5004':17528.72,'5005':0,'5006':2666.77,'5007':0,'5008':0,'5009':0,'5010':0     }, // Feb
+  { '5001':1446.03,'5002':0,       '5003':98.83,'5004':14.80,   '5005':0,'5006':2456.61,'5007':0,'5008':0,'5009':0,'5010':77.41 }, // Mar
+  { '5001':4507.09,'5002':0,       '5003':98.83,'5004':3000.00, '5005':0,'5006':284.68, '5007':0,'5008':0,'5009':0,'5010':0     }, // Apr
 ];
 
-var cashFlow = {
-  operating: -16123.90,
-  investing: 0,
-  financing: 291321.67,
-  netIncrease: 275197.77,
-  cashBeginning: 108.00,
-  cashEnd: 275305.77
-};
+const INC_ACCTS = [
+  { id:'3001', name:'3001 W2 Income' },
+  { id:'3002', name:'3002 Side Work Income' },
+  { id:'3003', name:'3003 Interest Income' },
+  { id:'3004', name:'3004 Rental Property Income', invest:true },
+  { id:'3005', name:'3005 Additional Taxes Owed' },
+  { id:'3006', name:'3006 Gifts from Others' },
+];
+const PERS_ACCTS = [
+  { id:'4001', name:'4001 Groceries' },
+  { id:'4002', name:'4002 Dining Out' },
+  { id:'4003', name:'4003 Entertainment' },
+  { id:'4004', name:'4004 Home' },
+  { id:'4005', name:'4005 Medical' },
+  { id:'4006', name:'4006 Personal Care / Clothing' },
+  { id:'4007', name:'4007 Subscriptions' },
+  { id:'4008', name:'4008 Transportation' },
+  { id:'4009', name:'4009 Travel' },
+  { id:'4010', name:'4010 Utilities' },
+  { id:'4011', name:'4011 Kids' },
+  { id:'4012', name:'4012 Pets' },
+  { id:'4013', name:'4013 Taxes' },
+  { id:'4014', name:'4014 Misc. Expenses' },
+];
+const INV_ACCTS = [
+  { id:'5001', name:'5001 Mortgage / Rent' },
+  { id:'5002', name:'5002 Property Tax' },
+  { id:'5003', name:'5003 Insurance' },
+  { id:'5004', name:'5004 Repairs & Maintenance' },
+  { id:'5005', name:'5005 Property Management' },
+  { id:'5006', name:'5006 Utilities' },
+  { id:'5007', name:'5007 HOA Fees' },
+  { id:'5008', name:'5008 Landscaping' },
+  { id:'5009', name:'5009 Vacancy / Turnover' },
+  { id:'5010', name:'5010 Misc. Property Expenses' },
+];
 
-// --- HELPERS -------------------------------------------------------------
-var fmt = function(v) {
-  var neg = v < 0;
-  var s = Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-  return neg ? '(' + s + ')' : s;
-};
-var fmtDollar = function(v) {
-  var neg = v < 0;
-  var s = '$' + Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-  return neg ? '(' + s + ')' : s;
-};
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let barChart, lineChart, expensePie, incomePie;
 
-function sumRange(arr, s, e) {
-  var t = 0;
-  for (var i = s; i <= e; i++) t += arr[i];
-  return t;
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const usd = v => v.toLocaleString('en-US', { style:'currency', currency:'USD' });
+const cls = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
+
+function getRange() {
+  const s = +document.getElementById('startMonth').value;
+  const e = +document.getElementById('endMonth').value;
+  return { s: Math.min(s,e), e: Math.max(s,e) };
 }
 
-function qboLink(s, e) {
-  return 'https://app.qbo.intuit.com/app/profitandloss?start_date=' + monthDates[s].start + '&end_date=' + monthDates[e].end + '&column=total';
+function monthTotals(i, si) {
+  let inc=0, pers=0, inv=0;
+  for (const a of INC_ACCTS)  { if (a.invest && !si) continue; inc  += INC[i][a.id]||0; }
+  for (const a of PERS_ACCTS) pers += PERS[i][a.id]||0;
+  if (si) for (const a of INV_ACCTS) inv += INVEST[i][a.id]||0;
+  return { inc, exp: pers+inv, net: inc-pers-inv };
 }
 
-// --- STATE ---------------------------------------------------------------
-var startIdx = 0, endIdx = 3, showInvest = true;
-var collapsed = {income: false, personal: false, invest: false};
+// ── MAIN UPDATE ───────────────────────────────────────────────────────────────
+function update() {
+  const { s, e } = getRange();
+  const si = document.getElementById('investToggle').checked;
+  let totInc=0, totExp=0, totNet=0;
+  for (let i=s; i<=e; i++) { const t=monthTotals(i,si); totInc+=t.inc; totExp+=t.exp; totNet+=t.net; }
 
-var startSel = document.getElementById('startMonth');
-var endSel = document.getElementById('endMonth');
-var investToggle = document.getElementById('investToggle');
+  document.getElementById('kpiIncome').textContent   = usd(totInc);
+  document.getElementById('kpiExpenses').textContent = usd(totExp);
+  const netEl = document.getElementById('kpiNet');
+  netEl.textContent = usd(totNet);
+  netEl.className   = 'kpi-value ' + (totNet >= 0 ? 'pos' : 'neg');
+  document.getElementById('tableTitle').textContent  =
+    s===e ? MONTHS[s].label : MONTHS[s].label + '\u2013' + MONTHS[e].label;
 
-startSel.addEventListener('change', function() { startIdx = +startSel.value; if (endIdx < startIdx) { endIdx = startIdx; endSel.value = endIdx; } render(); });
-endSel.addEventListener('change', function() { endIdx = +endSel.value; if (startIdx > endIdx) { startIdx = endIdx; startSel.value = startIdx; } render(); });
-investToggle.addEventListener('change', function() { showInvest = investToggle.checked; render(); });
+  buildBarChart(s, e, si);
+  buildLineChart(s, e, si);
+  buildExpensePie(s, e);
+  buildIncomePie(s, e, si);
+  buildTable(s, e, si);
+}
 
-// --- CHARTS --------------------------------------------------------------
-var barChart, lineChart, expPie, incPie;
-
-var pieColors = ['#2ecc71','#3498db','#e74c3c','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e','#d35400','#c0392b','#16a085','#8e44ad','#2c3e50','#27ae60'];
-
-function initCharts() {
+// ── BAR CHART ─────────────────────────────────────────────────────────────────
+function buildBarChart(s, e, si) {
+  const labels=[], incs=[], exps=[];
+  for (let i=s; i<=e; i++) {
+    const t = monthTotals(i, si);
+    labels.push(MONTHS[i].label); incs.push(t.inc); exps.push(t.exp);
+  }
+  if (barChart) barChart.destroy();
   barChart = new Chart(document.getElementById('barChart'), {
     type: 'bar',
-    data: { labels: [], datasets: [] },
-    options: {
-      responsive: true,
-      plugins: { legend: { position: 'top' } },
-      scales: { y: { ticks: { callback: function(v) { return '$' + v.toLocaleString(); } } } }
-    }
+    data: { labels, datasets: [
+      { label:'Income',   data:incs, backgroundColor:'rgba(34,197,94,0.8)',  borderRadius:4 },
+      { label:'Expenses', data:exps, backgroundColor:'rgba(239,68,68,0.8)',   borderRadius:4 },
+    ]},
+    options: { responsive:true, plugins:{ legend:{ position:'bottom' }},
+      scales:{ y:{ ticks:{ callback: v => '$' + v.toLocaleString() }}}}
   });
+}
+
+// ── LINE CHART ────────────────────────────────────────────────────────────────
+function buildLineChart(s, e, si) {
+  const labels=[], cum=[];
+  let running=0;
+  for (let i=s; i<=e; i++) {
+    running += monthTotals(i, si).net;
+    labels.push(MONTHS[i].label); cum.push(parseFloat(running.toFixed(2)));
+  }
+  if (lineChart) lineChart.destroy();
   lineChart = new Chart(document.getElementById('lineChart'), {
     type: 'line',
-    data: { labels: [], datasets: [] },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: { y: { ticks: { callback: function(v) { return '$' + v.toLocaleString(); } } } }
-    }
-  });
-  expPie = new Chart(document.getElementById('expPie'), {
-    type: 'pie',
-    data: { labels: [], datasets: [] },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'right',
-          maxWidth: 280,
-          labels: {
-            boxWidth: 14,
-            generateLabels: function(chart) {
-              var ds = chart.data.datasets[0];
-              if (!ds) return [];
-              var total = ds.data.reduce(function(a,b){return a+b;}, 0);
-              return chart.data.labels.map(function(l, i) {
-                return {
-                  text: l + ': ' + (ds.data[i]/total*100).toFixed(1) + '%',
-                  fillStyle: ds.backgroundColor[i],
-                  hidden: !chart.getDataVisibility(i),
-                  index: i
-                };
-              });
-            }
-          }
-        },
-        tooltip: {
-          callbacks: {
-            label: function(ctx) {
-              var total = ctx.dataset.data.reduce(function(a,b){return a+b;}, 0);
-              var pct = (ctx.parsed / total * 100).toFixed(1);
-              return ctx.label + ': $' + ctx.parsed.toLocaleString('en-US',{minimumFractionDigits:2}) + ' (' + pct + '%)';
-            }
-          }
-        }
-      }
-    }
-  });
-  incPie = new Chart(document.getElementById('incPie'), {
-    type: 'pie',
-    data: { labels: [], datasets: [] },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'right',
-          maxWidth: 280,
-          labels: {
-            boxWidth: 14,
-            generateLabels: function(chart) {
-              var ds = chart.data.datasets[0];
-              if (!ds) return [];
-              var total = ds.data.reduce(function(a,b){return a+b;}, 0);
-              return chart.data.labels.map(function(l, i) {
-                return {
-                  text: l + ': ' + (ds.data[i]/total*100).toFixed(1) + '%',
-                  fillStyle: ds.backgroundColor[i],
-                  hidden: !chart.getDataVisibility(i),
-                  index: i
-                };
-              });
-            }
-          }
-        },
-        tooltip: {
-          callbacks: {
-            label: function(ctx) {
-              var total = ctx.dataset.data.reduce(function(a,b){return a+b;}, 0);
-              var pct = (ctx.parsed / total * 100).toFixed(1);
-              return ctx.label + ': $' + ctx.parsed.toLocaleString('en-US',{minimumFractionDigits:2}) + ' (' + pct + '%)';
-            }
-          }
-        }
-      }
-    }
+    data: { labels, datasets: [{ label:'Cumulative Net Income', data:cum,
+      borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.1)',
+      fill:true, tension:0.3, pointRadius:5 }]},
+    options: { responsive:true, plugins:{ legend:{ position:'bottom' }},
+      scales:{ y:{ ticks:{ callback: v => '$' + v.toLocaleString() }}}}
   });
 }
 
-// --- RENDER --------------------------------------------------------------
-function render() {
-  var s = startIdx, e = endIdx;
-  var visMonths = months.slice(s, e + 1);
+// ── PIE CHARTS ────────────────────────────────────────────────────────────────
+const PIE_COLORS_EXP = ['#f87171','#fb923c','#fbbf24','#a3e635','#34d399','#22d3ee',
+                        '#60a5fa','#a78bfa','#f472b6','#fb7185','#4ade80','#818cf8','#f59e0b','#10b981'];
+const PIE_COLORS_INC = ['#22c55e','#3b82f6','#a855f7','#f59e0b','#06b6d4','#ec4899'];
 
-  // Compute filtered income
-  var incomeRows = showInvest ? incomeAccounts : incomeAccounts.filter(function(a){return a.code !== '3004';});
-  var totalIncomePerMonth = visMonths.map(function(_, mi) {
-    var idx = s + mi;
-    return incomeRows.reduce(function(acc, a){return acc + a.values[idx];}, 0);
+function makePieChart(canvasId, labels, values, colors) {
+  const total = values.reduce((a,b) => a+b, 0);
+  return new Chart(document.getElementById(canvasId), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data:values, backgroundColor:colors }]},
+    options: { responsive:true, plugins: {
+      legend: { position:'right', labels: { maxWidth:280, font:{ size:11 },
+        generateLabels: chart => chart.data.labels.map((lbl,i) => ({
+          text: lbl + ' (' + ((chart.data.datasets[0].data[i]/total)*100).toFixed(1) + '%)',
+          fillStyle: chart.data.datasets[0].backgroundColor[i], hidden:false, index:i
+        }))
+      }},
+      tooltip: { callbacks: { label: ctx => ' ' + usd(ctx.parsed) + ' (' + ((ctx.parsed/total)*100).toFixed(1) + '%)' }}
+    }}
   });
-  var totalIncome = totalIncomePerMonth.reduce(function(a,b){return a+b;}, 0);
-
-  // Compute filtered expenses
-  var personalPerMonth = visMonths.map(function(_, mi) {
-    var idx = s + mi;
-    return personalExpenses.reduce(function(acc, a){return acc + a.values[idx];}, 0);
-  });
-  var investPerMonth = visMonths.map(function(_, mi) {
-    var idx = s + mi;
-    return investExpenses.reduce(function(acc, a){return acc + a.values[idx];}, 0);
-  });
-  var totalExpPerMonth = visMonths.map(function(_, mi) {
-    return personalPerMonth[mi] + (showInvest ? investPerMonth[mi] : 0);
-  });
-  var totalExpenses = totalExpPerMonth.reduce(function(a,b){return a+b;}, 0);
-  var netIncome = totalIncome - totalExpenses;
-
-  // KPI cards
-  document.getElementById('kpiIncome').textContent = fmtDollar(totalIncome);
-  document.getElementById('kpiIncome').className = 'kpi-value positive';
-
-  document.getElementById('kpiExpenses').textContent = fmtDollar(totalExpenses);
-  document.getElementById('kpiExpenses').className = 'kpi-value negative';
-
-  var netEl = document.getElementById('kpiNet');
-  netEl.textContent = fmtDollar(netIncome);
-  netEl.className = 'kpi-value ' + (netIncome >= 0 ? 'positive' : 'negative');
-
-  document.getElementById('kpiCash').textContent = fmtDollar(cashFlow.cashEnd);
-  document.getElementById('kpiCash').className = 'kpi-value positive';
-
-  // Bar chart
-  barChart.data.labels = visMonths;
-  barChart.data.datasets = [
-    { label: 'Income', data: totalIncomePerMonth, backgroundColor: '#2ecc71' },
-    { label: 'Expenses', data: totalExpPerMonth, backgroundColor: '#e74c3c' }
-  ];
-  barChart.update();
-
-  // Line chart - cumulative net income
-  var cum = 0;
-  var cumData = visMonths.map(function(_, mi) {
-    cum += totalIncomePerMonth[mi] - totalExpPerMonth[mi];
-    return cum;
-  });
-  lineChart.data.labels = visMonths;
-  lineChart.data.datasets = [{
-    label: 'Cumulative Net Income',
-    data: cumData,
-    borderColor: '#2980b9',
-    backgroundColor: 'rgba(41,128,185,0.1)',
-    fill: true,
-    tension: 0.3,
-    pointRadius: 5
-  }];
-  lineChart.update();
-
-  // Expense pie (4000s only, show categories with positive totals)
-  var expLabels = [], expData = [], expColors = [];
-  personalExpenses.forEach(function(a, i) {
-    var v = sumRange(a.values, s, e);
-    if (v > 0) {
-      expLabels.push(a.name);
-      expData.push(Math.round(v * 100) / 100);
-      expColors.push(pieColors[i % pieColors.length]);
-    }
-  });
-  expPie.data.labels = expLabels;
-  expPie.data.datasets = [{ data: expData, backgroundColor: expColors }];
-  expPie.update();
-
-  // Income pie (positive sources only)
-  var incLabels = [], incData = [], incColors = [];
-  incomeRows.forEach(function(a, i) {
-    var v = sumRange(a.values, s, e);
-    if (v > 0) {
-      incLabels.push(a.name);
-      incData.push(Math.round(v * 100) / 100);
-      incColors.push(pieColors[i % pieColors.length]);
-    }
-  });
-  incPie.data.labels = incLabels;
-  incPie.data.datasets = [{ data: incData, backgroundColor: incColors }];
-  incPie.update();
-
-  // --- P&L Table ---------------------------------------------------------
-  var table = document.getElementById('plTable');
-  var colSpan = visMonths.length + 2;
-  var link = qboLink(s, e);
-  var html = '<thead><tr><th>Account</th>';
-  visMonths.forEach(function(m) { html += '<th>' + m + '</th>'; });
-  html += '<th>Total</th></tr></thead><tbody>';
-
-  // Income section
-  var incSym = collapsed.income ? '\u25B6' : '\u25BC';
-  html += '<tr class="section-header" data-section="income"><td colspan="' + colSpan + '">' + incSym + ' Income</td></tr>';
-  if (!collapsed.income) {
-    incomeRows.forEach(function(a) {
-      var vals = visMonths.map(function(_, mi){return a.values[s + mi];});
-      var total = vals.reduce(function(x,y){return x+y;}, 0);
-      html += '<tr class="child-row clickable" ondblclick="window.open(\'' + link + '\')">';
-      html += '<td>' + a.code + ' ' + a.name + '</td>';
-      vals.forEach(function(v) { html += '<td>' + fmt(v) + '</td>'; });
-      html += '<td>' + fmt(total) + '</td></tr>';
-    });
-    html += '<tr class="total-row"><td>Total Income</td>';
-    totalIncomePerMonth.forEach(function(v) { html += '<td>' + fmt(v) + '</td>'; });
-    html += '<td>' + fmt(totalIncome) + '</td></tr>';
-  }
-
-  // Personal Expenses section
-  var persSym = collapsed.personal ? '\u25B6' : '\u25BC';
-  html += '<tr class="section-header" data-section="personal"><td colspan="' + colSpan + '">' + persSym + ' Personal Expenses (4000s)</td></tr>';
-  if (!collapsed.personal) {
-    personalExpenses.forEach(function(a) {
-      var vals = visMonths.map(function(_, mi){return a.values[s + mi];});
-      var total = vals.reduce(function(x,y){return x+y;}, 0);
-      html += '<tr class="child-row clickable" ondblclick="window.open(\'' + link + '\')">';
-      html += '<td>' + a.code + ' ' + a.name + '</td>';
-      vals.forEach(function(v) { html += '<td>' + fmt(v) + '</td>'; });
-      html += '<td>' + fmt(total) + '</td></tr>';
-    });
-    var totalPers = personalPerMonth.reduce(function(a,b){return a+b;}, 0);
-    html += '<tr class="total-row"><td>Total Personal Expenses</td>';
-    personalPerMonth.forEach(function(v) { html += '<td>' + fmt(v) + '</td>'; });
-    html += '<td>' + fmt(totalPers) + '</td></tr>';
-  }
-
-  // Investment Property Expenses section
-  if (showInvest) {
-    var invSym = collapsed.invest ? '\u25B6' : '\u25BC';
-    html += '<tr class="section-header" data-section="invest"><td colspan="' + colSpan + '">' + invSym + ' Investment Property Expenses (5000s)</td></tr>';
-    if (!collapsed.invest) {
-      investExpenses.forEach(function(a) {
-        var vals = visMonths.map(function(_, mi){return a.values[s + mi];});
-        var total = vals.reduce(function(x,y){return x+y;}, 0);
-        html += '<tr class="child-row clickable" ondblclick="window.open(\'' + link + '\')">';
-        html += '<td>' + a.code + ' ' + a.name + '</td>';
-        vals.forEach(function(v) { html += '<td>' + fmt(v) + '</td>'; });
-        html += '<td>' + fmt(total) + '</td></tr>';
-      });
-      var totalInv = investPerMonth.reduce(function(a,b){return a+b;}, 0);
-      html += '<tr class="total-row"><td>Total Investment Property Expenses</td>';
-      investPerMonth.forEach(function(v) { html += '<td>' + fmt(v) + '</td>'; });
-      html += '<td>' + fmt(totalInv) + '</td></tr>';
-    }
-  }
-
-  // Net Income row
-  var netPerMonth = visMonths.map(function(_, mi) { return totalIncomePerMonth[mi] - totalExpPerMonth[mi]; });
-  html += '<tr class="net-row"><td>Net Income</td>';
-  netPerMonth.forEach(function(v) { html += '<td>' + fmt(v) + '</td>'; });
-  html += '<td>' + fmt(netIncome) + '</td></tr>';
-
-  html += '</tbody>';
-  table.innerHTML = html;
-
-  // Attach collapse handlers
-  table.querySelectorAll('.section-header').forEach(function(row) {
-    row.addEventListener('click', function() {
-      var sec = row.dataset.section;
-      collapsed[sec] = !collapsed[sec];
-      render();
-    });
-  });
-
-  // Cash flow section
-  document.getElementById('cfOp').textContent = fmtDollar(cashFlow.operating);
-  document.getElementById('cfInv').textContent = fmtDollar(cashFlow.investing);
-  document.getElementById('cfFin').textContent = fmtDollar(cashFlow.financing);
-  document.getElementById('cfNet').textContent = fmtDollar(cashFlow.netIncrease);
-  document.getElementById('cfBeg').textContent = fmtDollar(cashFlow.cashBeginning);
-  document.getElementById('cfEnd').textContent = fmtDollar(cashFlow.cashEnd);
 }
 
-// --- INIT ----------------------------------------------------------------
-initCharts();
-render();
+function buildExpensePie(s, e) {
+  const labels=[], vals=[];
+  for (const a of PERS_ACCTS) {
+    let t=0; for (let i=s; i<=e; i++) t += PERS[i][a.id]||0;
+    if (t > 0) { labels.push(a.name); vals.push(t); }
+  }
+  if (expensePie) expensePie.destroy();
+  if (vals.length) expensePie = makePieChart('expensePie', labels, vals, PIE_COLORS_EXP);
+}
+
+function buildIncomePie(s, e, si) {
+  const labels=[], vals=[];
+  for (const a of INC_ACCTS) {
+    if (a.invest && !si) continue;
+    let t=0; for (let i=s; i<=e; i++) t += INC[i][a.id]||0;
+    if (t > 0) { labels.push(a.name); vals.push(t); }
+  }
+  if (incomePie) incomePie.destroy();
+  if (vals.length) incomePie = makePieChart('incomePie', labels, vals, PIE_COLORS_INC);
+}
+
+// ── P&L TABLE ─────────────────────────────────────────────────────────────────
+function buildTable(s, e, si) {
+  const cols = MONTHS.slice(s, e+1);
+  const sd = MONTHS[s].start, ed = MONTHS[e].end;
+  const dlAttr = 'ondblclick="window.open(\'https://app.qbo.intuit.com/app/profitandloss?start_date=' + sd + '&end_date=' + ed + '&column=total\',\'_blank\')"';
+
+  document.getElementById('plHead').innerHTML =
+    '<tr><th>Account</th>' + cols.map(m => '<th>' + m.label + '</th>').join('') + '<th>Total</th></tr>';
+
+  const rows = [];
+
+  function addSection(label, grp) {
+    rows.push('<tr class="sec-hdr" onclick="toggleGrp(this,\'' + grp + '\')" ' + dlAttr + '><td colspan="' + (cols.length+2) + '">' + label + '</td></tr>');
+  }
+  function addSubRow(name, vals, grp) {
+    const tot = vals.reduce((a,b)=>a+b, 0);
+    if (vals.every(v=>v===0)) return;
+    rows.push('<tr class="sub-row ' + grp + '" ' + dlAttr + '><td>' + name + '</td>' +
+      vals.map(v => '<td class="' + cls(v) + '">' + (v===0 ? '&mdash;' : usd(v)) + '</td>').join('') +
+      '<td class="' + cls(tot) + '">' + usd(tot) + '</td></tr>');
+  }
+  function addTotalRow(label, vals, grp) {
+    const tot = vals.reduce((a,b)=>a+b, 0);
+    rows.push('<tr class="sec-total ' + grp + '" ' + dlAttr + '><td>' + label + '</td>' +
+      vals.map(v => '<td class="' + cls(v) + '">' + usd(v) + '</td>').join('') +
+      '<td class="' + cls(tot) + '">' + usd(tot) + '</td></tr>');
+  }
+
+  // Income
+  addSection('Income', 'grp-inc');
+  for (const a of INC_ACCTS) {
+    if (a.invest && !si) continue;
+    addSubRow(a.name, cols.map((_,k) => INC[s+k][a.id]||0), 'grp-inc');
+  }
+  const incCols = cols.map((_,k) => { let t=0; for(const a of INC_ACCTS){ if(a.invest&&!si) continue; t+=INC[s+k][a.id]||0; } return t; });
+  addTotalRow('Total Income', incCols, 'grp-inc');
+
+  // Personal Expenses
+  addSection('Personal Expenses (4000s)', 'grp-pers');
+  for (const a of PERS_ACCTS) addSubRow(a.name, cols.map((_,k) => PERS[s+k][a.id]||0), 'grp-pers');
+  const persCols = cols.map((_,k) => { let t=0; for(const a of PERS_ACCTS) t+=PERS[s+k][a.id]||0; return t; });
+  addTotalRow('Total Personal Expenses', persCols, 'grp-pers');
+
+  // Investment Property Expenses
+  if (si) {
+    addSection('Investment Property Expenses (5000s)', 'grp-inv');
+    for (const a of INV_ACCTS) addSubRow(a.name, cols.map((_,k) => INVEST[s+k][a.id]||0), 'grp-inv');
+    const invCols = cols.map((_,k) => { let t=0; for(const a of INV_ACCTS) t+=INVEST[s+k][a.id]||0; return t; });
+    addTotalRow('Total Investment Property Expenses', invCols, 'grp-inv');
+  }
+
+  // Net Income
+  const netCols = cols.map((_,k) => monthTotals(s+k, si).net);
+  const netTot  = netCols.reduce((a,b)=>a+b, 0);
+  rows.push('<tr class="grand-total" ' + dlAttr + '><td>Net Income</td>' +
+    netCols.map(v => '<td style="color:' + (v>=0?'#86efac':'#fca5a5') + '">' + usd(v) + '</td>').join('') +
+    '<td style="color:' + (netTot>=0?'#86efac':'#fca5a5') + '">' + usd(netTot) + '</td></tr>');
+
+  document.getElementById('plBody').innerHTML = rows.join('');
+}
+
+function toggleGrp(hdr, grp) {
+  hdr.classList.toggle('collapsed');
+  document.querySelectorAll('.' + grp).forEach(r => r.classList.toggle('hidden-row'));
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+update();
 </script>
 </body>
 </html>
