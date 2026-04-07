@@ -1,416 +1,454 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tom Family Financial Dashboard — 2026</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #333; }
-    header {
-      background: linear-gradient(135deg, #1a1a2e, #16213e);
-      color: white; padding: 24px 32px;
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
-    }
-    header h1 { font-size: 1.5rem; font-weight: 600; }
-    header .subtitle { font-size: 0.85rem; opacity: 0.7; margin-top: 4px; }
-    .controls { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-    .controls label { font-size: 0.85rem; opacity: 0.85; }
-    .controls select {
-      background: rgba(255,255,255,0.15); color: white;
-      border: 1px solid rgba(255,255,255,0.3); border-radius: 6px;
-      padding: 6px 10px; font-size: 0.85rem;
-    }
-    .controls select option { background: #16213e; }
-    .toggle-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.85rem; opacity: 0.85; }
-    .toggle-btn input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
-    main { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
-    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-    .kpi-card {
-      background: white; border-radius: 10px; padding: 20px;
-      border-left: 4px solid #ccc; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .kpi-card.income   { border-color: #22c55e; }
-    .kpi-card.expenses { border-color: #ef4444; }
-    .kpi-card.net      { border-color: #3b82f6; }
-    .kpi-card.cash     { border-color: #a855f7; }
-    .kpi-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #888; margin-bottom: 8px; }
-    .kpi-value { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-    .kpi-card.income   .kpi-value { color: #22c55e; }
-    .kpi-card.expenses .kpi-value { color: #ef4444; }
-    .kpi-card.cash     .kpi-value { color: #a855f7; }
-    .pos { color: #22c55e; } .neg { color: #ef4444; }
-    .chart-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
-    .chart-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-    .chart-card h3 { font-size: 0.9rem; font-weight: 600; color: #555; margin-bottom: 16px; }
-    .chart-card canvas { max-height: 260px; }
-    .table-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; overflow-x: auto; }
-    .table-card h3 { font-size: 0.9rem; font-weight: 600; color: #555; margin-bottom: 4px; }
-    .date-note { font-size: 0.75rem; color: #aaa; margin-bottom: 16px; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; font-variant-numeric: tabular-nums; }
-    th {
-      background: #f8f9fa; padding: 10px 12px; text-align: right;
-      font-weight: 600; color: #555; border-bottom: 2px solid #e5e7eb;
-      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em;
-    }
-    th:first-child { text-align: left; }
-    td { padding: 8px 12px; text-align: right; border-bottom: 1px solid #f3f4f6; color: #444; }
-    td:first-child { text-align: left; }
-    tr.sec-hdr td { background: #f8f9fa; font-weight: 700; color: #333; cursor: pointer; }
-    tr.sec-hdr td:first-child::before { content: '\25BC  '; font-size: 0.7em; }
-    tr.sec-hdr.collapsed td:first-child::before { content: '\25B6  '; }
-    tr.sec-total td { background: #f0f9ff; font-weight: 700; border-top: 2px solid #e0f2fe; }
-    tr.grand-total td { background: #1e3a5f; color: white; font-weight: 700; font-size: 0.95rem; }
-    tr.sub-row td:first-child { padding-left: 28px; }
-    tr:not(.sec-hdr):not(.sec-total):not(.grand-total):hover { background: #f9fafb; }
-    tr.hidden-row { display: none; }
-    .cf-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; }
-    .cf-card h3 { font-size: 0.9rem; font-weight: 600; color: #555; margin-bottom: 16px; }
-    .cf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
-    .cf-item { background: #f8f9fa; border-radius: 8px; padding: 16px; text-align: center; }
-    .cf-lbl { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #888; margin-bottom: 8px; }
-    .cf-val { font-size: 1.2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-    .cf-summary { display: flex; gap: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
-    .cf-sum-item { flex: 1; text-align: center; }
-    .cf-sum-item .cf-val { font-size: 1.1rem; color: #a855f7; }
-    @media (max-width: 900px) {
-      main { padding: 16px; }
-      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-      .chart-grid { grid-template-columns: 1fr; }
-      .cf-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tom Family Financial Dashboard — 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0f2f5;color:#1a1a2e;font-size:14px}
+header{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);color:#fff;padding:20px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+header h1{font-size:22px;font-weight:700;letter-spacing:.3px}
+.controls{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.controls label{color:#ccd6f6;font-size:13px;font-weight:500}
+.controls select{background:#243354;color:#fff;border:1px solid #3a4f7a;border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer}
+.toggle-wrap{display:flex;align-items:center;gap:8px;color:#ccd6f6;font-size:13px}
+.toggle-wrap input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:#64ffda}
+main{padding:24px 32px;max-width:1400px;margin:0 auto}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi-card{background:#fff;border-radius:10px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.08);border-left:4px solid #ccc}
+.kpi-card.income{border-color:#2ecc71}
+.kpi-card.expenses{border-color:#e74c3c}
+.kpi-card.net{border-color:#3498db}
+.kpi-card.cash{border-color:#9b59b6}
+.kpi-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:#6b7c93;font-weight:600;margin-bottom:6px}
+.kpi-card .value{font-size:24px;font-weight:700;color:#1a1a2e;font-variant-numeric:tabular-nums}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.chart-card{background:#fff;border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.chart-card h3{font-size:13px;font-weight:600;color:#6b7c93;text-transform:uppercase;letter-spacing:.6px;margin-bottom:16px}
+.chart-card.full{grid-column:1/-1}
+.chart-wrap{position:relative;height:260px}
+.pies-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.pie-wrap{position:relative;height:280px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:#f7f8fa;color:#6b7c93;text-align:right;padding:8px 12px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #e8ecf0;position:sticky;top:0;z-index:1}
+thead th:first-child{text-align:left}
+tbody tr{border-bottom:1px solid #f0f2f5;cursor:pointer}
+tbody tr:hover{background:#f7f9ff}
+td{padding:7px 12px;font-variant-numeric:tabular-nums;text-align:right;color:#1a1a2e}
+td:first-child{text-align:left}
+tr.section-header td{background:#f0f2f5;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#3a4f7a;cursor:pointer}
+tr.section-header td:first-child::before{content:'▼ ';font-size:10px;color:#9aa5b4}
+tr.section-header.collapsed td:first-child::before{content:'▶ ';font-size:10px;color:#9aa5b4}
+tr.section-total td{font-weight:700;background:#f7f8fa;border-top:2px solid #dde3ed}
+tr.net-row td{font-weight:700;font-size:14px;background:#1a1a2e;color:#fff;border-top:3px solid #3498db}
+tr.hidden{display:none}
+.invest-hidden{display:none}
+.table-wrap{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden;margin-bottom:24px}
+.table-wrap .table-header{padding:16px 20px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between}
+.table-wrap .table-header h3{font-size:13px;font-weight:600;color:#6b7c93;text-transform:uppercase;letter-spacing:.6px}
+.table-scroll{overflow-x:auto}
+.cf-card{background:#fff;border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:24px}
+.cf-card h3{font-size:13px;font-weight:600;color:#6b7c93;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.cf-title{font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:16px}
+.cf-table{width:100%;border-collapse:collapse}
+.cf-table tr{border-bottom:1px solid #f0f2f5}
+.cf-table td{padding:7px 12px;font-size:13px;font-variant-numeric:tabular-nums}
+.cf-table td:last-child{text-align:right;font-weight:500}
+.cf-table tr.cf-section td{font-weight:700;color:#3a4f7a;background:#f7f8fa;padding-top:10px;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+.cf-table tr.cf-total td{font-weight:700;border-top:2px solid #dde3ed;border-bottom:2px solid #dde3ed}
+.cf-table tr.cf-grand td{font-weight:700;font-size:14px;background:#1a1a2e;color:#fff}
+.cf-table td.indent{padding-left:28px}
+@media(max-width:900px){.kpi-grid{grid-template-columns:1fr 1fr}.charts-grid{grid-template-columns:1fr}.pies-grid{grid-template-columns:1fr}main{padding:16px}.chart-card.full{grid-column:auto}}
+</style>
 </head>
 <body>
 <header>
-  <div>
-    <h1>Tom Family Financial Dashboard &mdash; 2026</h1>
-    <div class="subtitle">Personal Life &middot; QuickBooks Online &middot; Generated April 6, 2026</div>
-  </div>
+  <h1>Tom Family Financial Dashboard — 2026</h1>
   <div class="controls">
-    <label>From
-      <select id="startMonth" onchange="update()">
-        <option value="0">Jan 2026</option>
-        <option value="1">Feb 2026</option>
-        <option value="2">Mar 2026</option>
-        <option value="3">Apr 2026</option>
-      </select>
-    </label>
-    <label>To
-      <select id="endMonth" onchange="update()">
-        <option value="0">Jan 2026</option>
-        <option value="1">Feb 2026</option>
-        <option value="2">Mar 2026</option>
-        <option value="3" selected>Apr 2026</option>
-      </select>
-    </label>
-    <label class="toggle-btn">
-      <input type="checkbox" id="investToggle" checked onchange="update()">
-      Investment Properties
-    </label>
+    <label>From <select id="startMonth">
+      <option value="0">Jan 2026</option>
+      <option value="1">Feb 2026</option>
+      <option value="2">Mar 2026</option>
+      <option value="3">Apr 2026</option>
+    </select></label>
+    <label>To <select id="endMonth">
+      <option value="0">Jan 2026</option>
+      <option value="1">Feb 2026</option>
+      <option value="2">Mar 2026</option>
+      <option value="3" selected>Apr 2026</option>
+    </select></label>
+    <div class="toggle-wrap">
+      <input type="checkbox" id="investToggle" checked>
+      <label for="investToggle">Investment Properties</label>
+    </div>
   </div>
 </header>
 <main>
   <div class="kpi-grid">
-    <div class="kpi-card income">  <div class="kpi-label">Total Income</div>   <div class="kpi-value" id="kpiIncome">—</div></div>
-    <div class="kpi-card expenses"><div class="kpi-label">Total Expenses</div> <div class="kpi-value" id="kpiExpenses">—</div></div>
-    <div class="kpi-card net">     <div class="kpi-label">Net Income</div>     <div class="kpi-value" id="kpiNet">—</div></div>
-    <div class="kpi-card cash">    <div class="kpi-label">Cash at End of Period</div><div class="kpi-value">$282,305.77</div></div>
+    <div class="kpi-card income"><div class="label">Total Income</div><div class="value" id="kpiIncome">—</div></div>
+    <div class="kpi-card expenses"><div class="label">Total Expenses</div><div class="value" id="kpiExpenses">—</div></div>
+    <div class="kpi-card net"><div class="label">Net Income</div><div class="value" id="kpiNet">—</div></div>
+    <div class="kpi-card cash"><div class="label">Cash at End of Period</div><div class="value" id="kpiCash">—</div></div>
   </div>
-  <div class="chart-grid">
-    <div class="chart-card"><h3>Monthly Income vs. Expenses</h3><canvas id="barChart"></canvas></div>
-    <div class="chart-card"><h3>Cumulative Net Income</h3><canvas id="lineChart"></canvas></div>
+
+  <div class="charts-grid">
+    <div class="chart-card full"><h3>Monthly Income vs. Expenses</h3><div class="chart-wrap"><canvas id="barChart"></canvas></div></div>
+    <div class="chart-card full"><h3>Cumulative Net Income</h3><div class="chart-wrap"><canvas id="lineChart"></canvas></div></div>
   </div>
-  <div class="chart-grid">
-    <div class="chart-card"><h3>Expense Breakdown (Personal 4000s)</h3><canvas id="expensePie"></canvas></div>
-    <div class="chart-card"><h3>Income by Source</h3><canvas id="incomePie"></canvas></div>
+
+  <div class="pies-grid">
+    <div class="chart-card"><h3>Personal Expenses by Category</h3><div class="pie-wrap"><canvas id="expPie"></canvas></div></div>
+    <div class="chart-card"><h3>Income by Source</h3><div class="pie-wrap"><canvas id="incPie"></canvas></div></div>
   </div>
-  <div class="table-card">
-    <h3>Profit &amp; Loss &mdash; <span id="tableTitle"></span></h3>
-    <div class="date-note">Double-click any row to open in QuickBooks Online</div>
-    <table><thead id="plHead"></thead><tbody id="plBody"></tbody></table>
+
+  <div class="table-wrap">
+    <div class="table-header">
+      <h3>Profit &amp; Loss</h3>
+      <span style="font-size:12px;color:#9aa5b4">Double-click any row to open in QuickBooks</span>
+    </div>
+    <div class="table-scroll"><table id="plTable"><thead id="plHead"></thead><tbody id="plBody"></tbody></table></div>
   </div>
+
   <div class="cf-card">
-    <h3>Statement of Cash Flows &mdash; Jan 1&ndash;Apr 6, 2026</h3>
-    <div class="cf-grid">
-      <div class="cf-item"><div class="cf-lbl">Operating Activities</div><div class="cf-val neg">-$9,123.90</div></div>
-      <div class="cf-item"><div class="cf-lbl">Investing Activities</div><div class="cf-val">$0.00</div></div>
-      <div class="cf-item"><div class="cf-lbl">Financing Activities</div><div class="cf-val pos">$291,321.67</div></div>
-    </div>
-    <div class="cf-summary">
-      <div class="cf-sum-item"><div class="cf-lbl">Cash at Beginning</div><div class="cf-val">$108.00</div></div>
-      <div class="cf-sum-item"><div class="cf-lbl">Net Cash Increase</div><div class="cf-val">$282,197.77</div></div>
-      <div class="cf-sum-item"><div class="cf-lbl">Cash at End of Period</div><div class="cf-val">$282,305.77</div></div>
-    </div>
+    <h3>Cash Flow Statement</h3>
+    <div class="cf-title" id="cfTitle">Statement of Cash Flows</div>
+    <table class="cf-table" id="cfTable"></table>
   </div>
 </main>
+
 <script>
-// ── DATA ──────────────────────────────────────────────────────────────────────
 const MONTHS = [
-  { label:'Jan 2026', start:'2026-01-01', end:'2026-01-31' },
-  { label:'Feb 2026', start:'2026-02-01', end:'2026-02-28' },
-  { label:'Mar 2026', start:'2026-03-01', end:'2026-03-31' },
-  { label:'Apr 2026', start:'2026-04-01', end:'2026-04-06' },
+  { label:"Jan 2026", short:"Jan", start:"2026-01-01", end:"2026-01-31" },
+  { label:"Feb 2026", short:"Feb", start:"2026-02-01", end:"2026-02-28" },
+  { label:"Mar 2026", short:"Mar", start:"2026-03-01", end:"2026-03-31" },
+  { label:"Apr 2026", short:"Apr", start:"2026-04-01", end:"2026-04-06" }
+];
+const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+const INCOME_ACCOUNTS = [
+  { id:"3001", name:"3001 W2 Income",              values:[7948.39, 7948.40, 7948.40, 3980.78], investProp:false },
+  { id:"3002", name:"3002 Side Work Income",        values:[2157.06, 1741.59, 2872.60, 0],      investProp:false },
+  { id:"3003", name:"3003 Interest Income",         values:[642.99,  524.21,  506.53,  0],      investProp:false },
+  { id:"3004", name:"3004 Rental Property Income",  values:[6722.32, 7854.22, 5164.56, 0],      investProp:true  },
+  { id:"3005", name:"3005 Additional Taxes Owed",   values:[0,       0,      -801.64,  0],      investProp:false },
+  { id:"3006", name:"3006 Gifts from Others",       values:[482.00,  0,       1247.00, 0],      investProp:false }
 ];
 
-// Income by month
-const INC = [
-  { '3001':7948.39, '3002':2157.06, '3003':642.99,  '3004':6722.32, '3005':0,       '3006':482.00  }, // Jan
-  { '3001':7948.40, '3002':1741.59, '3003':524.21,  '3004':7854.22, '3005':0,       '3006':0       }, // Feb
-  { '3001':7948.40, '3002':2872.60, '3003':506.53,  '3004':5164.56, '3005':-801.64, '3006':1247.00 }, // Mar
-  { '3001':3980.78, '3002':0,       '3003':0,        '3004':0,       '3005':0,       '3006':0       }, // Apr
+const EXP_4000 = [
+  { id:"4001", name:"4001 Groceries",                values:[721.63,  667.02,  715.12,   0]    },
+  { id:"4002", name:"4002 Dining Out",               values:[7123.93, 137.98,  128.40,   0]    },
+  { id:"4003", name:"4003 Entertainment",            values:[45.97,   191.80,  21.99,    0]    },
+  { id:"4004", name:"4004 Home",                     values:[0,       0,       0,        0]    },
+  { id:"4005", name:"4005 Medical",                  values:[297.75,  647.06,  292.41,   0]    },
+  { id:"4006", name:"4006 Personal Care / Clothing", values:[142.38,  139.48,  111.83,   0]    },
+  { id:"4007", name:"4007 Subscriptions",            values:[0,       0,       0,        0]    },
+  { id:"4008", name:"4008 Transportation",           values:[403.32,  753.65,  1778.00,  1.85] },
+  { id:"4009", name:"4009 Travel",                   values:[0,       90.66,  -326.17,   0]    },
+  { id:"4010", name:"4010 Utilities",                values:[0,       0,       0,        0]    },
+  { id:"4011", name:"4011 Kids",                     values:[337.50,  0,       61.25,    0]    },
+  { id:"4012", name:"4012 Pets",                     values:[0,       0,       0,        0]    },
+  { id:"4013", name:"4013 Taxes",                    values:[0,       0,       0,        0]    },
+  { id:"4014", name:"4014 Misc. Expenses",           values:[20.00,   143.45, -121.01,   0]    }
 ];
 
-// Personal expenses (4000s) — Other Expenses (parking, OEM) folded into 4008/4014
-const PERS = [
-  // Jan: 4008 includes +1.35 parking tolls
-  { '4001':721.63,'4002':123.93,'4003':45.97, '4004':0,'4005':297.75,'4006':0,'4007':0,'4008':403.32,'4009':0,      '4010':0,'4011':337.50,'4012':0,'4013':0,'4014':162.38 },
-  // Feb: no Other Expenses
-  { '4001':667.02,'4002':137.98,'4003':191.80,'4004':0,'4005':647.06,'4006':0,'4007':0,'4008':753.65,'4009':90.66,  '4010':0,'4011':0,    '4012':0,'4013':0,'4014':282.93 },
-  // Mar: 4008 includes +7.05 parking; 4014 includes -165.00 OEM pass-through
-  { '4001':715.12,'4002':128.40,'4003':21.99, '4004':0,'4005':292.41,'4006':0,'4007':0,'4008':1778.00,'4009':-326.17,'4010':0,'4011':61.25,'4012':0,'4013':0,'4014':-9.18 },
-  // Apr: 4008 includes +1.85 parking tolls
-  { '4001':0,    '4002':0,     '4003':0,     '4004':0,'4005':0,     '4006':0,'4007':0,'4008':1.85,  '4009':0,      '4010':0,'4011':0,    '4012':0,'4013':0,'4014':0     },
+const EXP_5000 = [
+  { id:"5001", name:"5001 Mortgage / Rent",          values:[8616.30, 4524.20, 1446.03, 4507.09] },
+  { id:"5002", name:"5002 Property Tax",             values:[0,       4123.26, 0,       0]       },
+  { id:"5003", name:"5003 Insurance",                values:[98.83,   98.83,   98.83,   98.83]   },
+  { id:"5004", name:"5004 Repairs & Maintenance",    values:[13173.33,17528.72,14.80,   3000.00] },
+  { id:"5005", name:"5005 Property Management",      values:[0,       0,       0,       0]       },
+  { id:"5006", name:"5006 Utilities",                values:[346.85,  2666.77, 2456.61, 284.68]  },
+  { id:"5007", name:"5007 HOA Fees",                 values:[0,       0,       0,       0]       },
+  { id:"5008", name:"5008 Landscaping",              values:[0,       0,       0,       0]       },
+  { id:"5009", name:"5009 Vacancy / Turnover",       values:[0,       0,       0,       0]       },
+  { id:"5010", name:"5010 Misc. Property Expenses",  values:[0,       0,       77.41,   0]       }
 ];
 
-// Investment property expenses (5000s)
-const INVEST = [
-  { '5001':8616.30,'5002':0,       '5003':98.83,'5004':13173.33,'5005':0,'5006':346.85, '5007':0,'5008':0,'5009':0,'5010':0     }, // Jan
-  { '5001':4524.20,'5002':4123.26, '5003':98.83,'5004':17528.72,'5005':0,'5006':2666.77,'5007':0,'5008':0,'5009':0,'5010':0     }, // Feb
-  { '5001':1446.03,'5002':0,       '5003':98.83,'5004':14.80,   '5005':0,'5006':2456.61,'5007':0,'5008':0,'5009':0,'5010':77.41 }, // Mar
-  { '5001':4507.09,'5002':0,       '5003':98.83,'5004':3000.00, '5005':0,'5006':284.68, '5007':0,'5008':0,'5009':0,'5010':0     }, // Apr
-];
+const CF_FINANCING     = [291321.67, 0, 0, 0];
+const CF_INVESTING     = [0, 0, 0, 0];
+const CF_BEGINNING_CASH = 108.00;
 
-const INC_ACCTS = [
-  { id:'3001', name:'3001 W2 Income' },
-  { id:'3002', name:'3002 Side Work Income' },
-  { id:'3003', name:'3003 Interest Income' },
-  { id:'3004', name:'3004 Rental Property Income', invest:true },
-  { id:'3005', name:'3005 Additional Taxes Owed' },
-  { id:'3006', name:'3006 Gifts from Others' },
-];
-const PERS_ACCTS = [
-  { id:'4001', name:'4001 Groceries' },
-  { id:'4002', name:'4002 Dining Out' },
-  { id:'4003', name:'4003 Entertainment' },
-  { id:'4004', name:'4004 Home' },
-  { id:'4005', name:'4005 Medical' },
-  { id:'4006', name:'4006 Personal Care / Clothing' },
-  { id:'4007', name:'4007 Subscriptions' },
-  { id:'4008', name:'4008 Transportation' },
-  { id:'4009', name:'4009 Travel' },
-  { id:'4010', name:'4010 Utilities' },
-  { id:'4011', name:'4011 Kids' },
-  { id:'4012', name:'4012 Pets' },
-  { id:'4013', name:'4013 Taxes' },
-  { id:'4014', name:'4014 Misc. Expenses' },
-];
-const INV_ACCTS = [
-  { id:'5001', name:'5001 Mortgage / Rent' },
-  { id:'5002', name:'5002 Property Tax' },
-  { id:'5003', name:'5003 Insurance' },
-  { id:'5004', name:'5004 Repairs & Maintenance' },
-  { id:'5005', name:'5005 Property Management' },
-  { id:'5006', name:'5006 Utilities' },
-  { id:'5007', name:'5007 HOA Fees' },
-  { id:'5008', name:'5008 Landscaping' },
-  { id:'5009', name:'5009 Vacancy / Turnover' },
-  { id:'5010', name:'5010 Misc. Property Expenses' },
-];
+// ── Formatters ──────────────────────────────────────────────────────────────
+const usd = v => v.toLocaleString('en-US',{style:'currency',currency:'USD'});
+const usdAcct = v => {
+  const abs = Math.abs(v).toLocaleString('en-US',{style:'currency',currency:'USD'});
+  return v < 0 ? `(${abs})` : abs;
+};
+const usdAcctZero = v => usdAcct(v);
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let barChart, lineChart, expensePie, incomePie;
+// ── Chart instances ─────────────────────────────────────────────────────────
+let barChart, lineChart, expPie, incPie;
 
-// ── HELPERS ───────────────────────────────────────────────────────────────────
-const usd = v => v.toLocaleString('en-US', { style:'currency', currency:'USD' });
-const cls = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
-
-function getRange() {
-  const s = +document.getElementById('startMonth').value;
-  const e = +document.getElementById('endMonth').value;
-  return { s: Math.min(s,e), e: Math.max(s,e) };
-}
-
-function monthTotals(i, si) {
-  let inc=0, pers=0, inv=0;
-  for (const a of INC_ACCTS)  { if (a.invest && !si) continue; inc  += INC[i][a.id]||0; }
-  for (const a of PERS_ACCTS) pers += PERS[i][a.id]||0;
-  if (si) for (const a of INV_ACCTS) inv += INVEST[i][a.id]||0;
-  return { inc, exp: pers+inv, net: inc-pers-inv };
-}
-
-// ── MAIN UPDATE ───────────────────────────────────────────────────────────────
-function update() {
-  const { s, e } = getRange();
-  const si = document.getElementById('investToggle').checked;
-  let totInc=0, totExp=0, totNet=0;
-  for (let i=s; i<=e; i++) { const t=monthTotals(i,si); totInc+=t.inc; totExp+=t.exp; totNet+=t.net; }
-
-  document.getElementById('kpiIncome').textContent   = usd(totInc);
-  document.getElementById('kpiExpenses').textContent = usd(totExp);
-  const netEl = document.getElementById('kpiNet');
-  netEl.textContent = usd(totNet);
-  netEl.className   = 'kpi-value ' + (totNet >= 0 ? 'pos' : 'neg');
-  document.getElementById('tableTitle').textContent  =
-    s===e ? MONTHS[s].label : MONTHS[s].label + '\u2013' + MONTHS[e].label;
-
-  buildBarChart(s, e, si);
-  buildLineChart(s, e, si);
-  buildExpensePie(s, e);
-  buildIncomePie(s, e, si);
-  buildTable(s, e, si);
-}
-
-// ── BAR CHART ─────────────────────────────────────────────────────────────────
-function buildBarChart(s, e, si) {
-  const labels=[], incs=[], exps=[];
-  for (let i=s; i<=e; i++) {
-    const t = monthTotals(i, si);
-    labels.push(MONTHS[i].label); incs.push(t.inc); exps.push(t.exp);
-  }
-  if (barChart) barChart.destroy();
+function buildCharts() {
   barChart = new Chart(document.getElementById('barChart'), {
-    type: 'bar',
-    data: { labels, datasets: [
-      { label:'Income',   data:incs, backgroundColor:'rgba(34,197,94,0.8)',  borderRadius:4 },
-      { label:'Expenses', data:exps, backgroundColor:'rgba(239,68,68,0.8)',   borderRadius:4 },
+    type:'bar',
+    data:{ labels:[], datasets:[
+      { label:'Income',   data:[], backgroundColor:'rgba(46,204,113,.85)',  borderRadius:4 },
+      { label:'Expenses', data:[], backgroundColor:'rgba(231,76,60,.85)',   borderRadius:4 }
     ]},
-    options: { responsive:true, plugins:{ legend:{ position:'bottom' }},
-      scales:{ y:{ ticks:{ callback: v => '$' + v.toLocaleString() }}}}
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'top' },
+        tooltip:{ callbacks:{ label: ctx => ' '+usd(ctx.raw) } } },
+      scales:{ y:{ ticks:{ callback: v => usd(v) }, grid:{ color:'#f0f2f5' } } } }
   });
-}
 
-// ── LINE CHART ────────────────────────────────────────────────────────────────
-function buildLineChart(s, e, si) {
-  const labels=[], cum=[];
-  let running=0;
-  for (let i=s; i<=e; i++) {
-    running += monthTotals(i, si).net;
-    labels.push(MONTHS[i].label); cum.push(parseFloat(running.toFixed(2)));
-  }
-  if (lineChart) lineChart.destroy();
   lineChart = new Chart(document.getElementById('lineChart'), {
-    type: 'line',
-    data: { labels, datasets: [{ label:'Cumulative Net Income', data:cum,
-      borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.1)',
-      fill:true, tension:0.3, pointRadius:5 }]},
-    options: { responsive:true, plugins:{ legend:{ position:'bottom' }},
-      scales:{ y:{ ticks:{ callback: v => '$' + v.toLocaleString() }}}}
+    type:'line',
+    data:{ labels:[], datasets:[{
+      label:'Cumulative Net Income', data:[],
+      borderColor:'#3498db', backgroundColor:'rgba(52,152,219,.1)',
+      fill:true, tension:.35, pointRadius:5, pointHoverRadius:7
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'top' },
+        tooltip:{ callbacks:{ label: ctx => ' '+usd(ctx.raw) } } },
+      scales:{ y:{ ticks:{ callback: v => usd(v) }, grid:{ color:'#f0f2f5' } } } }
+  });
+
+  const PIE_COLORS = ['#3498db','#e74c3c','#2ecc71','#f39c12','#9b59b6',
+    '#1abc9c','#e67e22','#34495e','#e91e63','#00bcd4','#8bc34a','#ff5722','#795548','#607d8b'];
+
+  const pieOpts = (pos) => ({ responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{ position:pos, maxWidth:280,
+        labels:{ generateLabels: chart => {
+          const ds = chart.data.datasets[0];
+          const total = ds.data.reduce((a,b)=>a+b,0);
+          return chart.data.labels.map((l,i)=>({
+            text:`${l}: ${total>0?(ds.data[i]/total*100).toFixed(1)+'%':'0%'}`,
+            fillStyle:ds.backgroundColor[i], hidden:false, index:i
+          }));
+        }}},
+      tooltip:{ callbacks:{ label: ctx => {
+        const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+        return ` ${usd(ctx.raw)} (${total>0?(ctx.raw/total*100).toFixed(1)+'%':'0%'})`;
+      }}}
+    }
+  });
+
+  expPie = new Chart(document.getElementById('expPie'), {
+    type:'pie',
+    data:{ labels:[], datasets:[{ data:[], backgroundColor:PIE_COLORS }]},
+    options: pieOpts('right')
+  });
+
+  incPie = new Chart(document.getElementById('incPie'), {
+    type:'pie',
+    data:{ labels:[], datasets:[{ data:[], backgroundColor:PIE_COLORS }]},
+    options: pieOpts('right')
   });
 }
 
-// ── PIE CHARTS ────────────────────────────────────────────────────────────────
-const PIE_COLORS_EXP = ['#f87171','#fb923c','#fbbf24','#a3e635','#34d399','#22d3ee',
-                        '#60a5fa','#a78bfa','#f472b6','#fb7185','#4ade80','#818cf8','#f59e0b','#10b981'];
-const PIE_COLORS_INC = ['#22c55e','#3b82f6','#a855f7','#f59e0b','#06b6d4','#ec4899'];
+// ── Main update ─────────────────────────────────────────────────────────────
+function updateDashboard() {
+  const s = parseInt(document.getElementById('startMonth').value);
+  let e   = parseInt(document.getElementById('endMonth').value);
+  if (e < s) { e = s; document.getElementById('endMonth').value = s; }
+  const showInvest = document.getElementById('investToggle').checked;
 
-function makePieChart(canvasId, labels, values, colors) {
-  const total = values.reduce((a,b) => a+b, 0);
-  return new Chart(document.getElementById(canvasId), {
-    type: 'doughnut',
-    data: { labels, datasets: [{ data:values, backgroundColor:colors }]},
-    options: { responsive:true, plugins: {
-      legend: { position:'right', labels: { maxWidth:280, font:{ size:11 },
-        generateLabels: chart => chart.data.labels.map((lbl,i) => ({
-          text: lbl + ' (' + ((chart.data.datasets[0].data[i]/total)*100).toFixed(1) + '%)',
-          fillStyle: chart.data.datasets[0].backgroundColor[i], hidden:false, index:i
-        }))
-      }},
-      tooltip: { callbacks: { label: ctx => ' ' + usd(ctx.parsed) + ' (' + ((ctx.parsed/total)*100).toFixed(1) + '%)' }}
-    }}
+  const months = [], incomeArr = [], expArr = [];
+  for (let i = s; i <= e; i++) {
+    months.push(MONTHS[i].short);
+    let inc = 0, exp = 0;
+    for (const a of INCOME_ACCOUNTS) { if (!showInvest && a.investProp) continue; inc += a.values[i]; }
+    for (const a of EXP_4000) exp += a.values[i];
+    if (showInvest) for (const a of EXP_5000) exp += a.values[i];
+    incomeArr.push(inc);
+    expArr.push(exp);
+  }
+
+  const totalIncome   = incomeArr.reduce((a,b)=>a+b,0);
+  const totalExpenses = expArr.reduce((a,b)=>a+b,0);
+  const netIncome     = totalIncome - totalExpenses;
+
+  let investingCash = 0, financingCash = 0;
+  for (let i = s; i <= e; i++) { investingCash += CF_INVESTING[i]; financingCash += CF_FINANCING[i]; }
+  const operatingCash = netIncome;
+
+  // Roll forward beginning cash (full accounts, ignore toggle)
+  let beginCash = CF_BEGINNING_CASH;
+  for (let i = 0; i < s; i++) {
+    let mn = 0;
+    for (const a of INCOME_ACCOUNTS) mn += a.values[i];
+    for (const a of EXP_4000) mn -= a.values[i];
+    for (const a of EXP_5000) mn -= a.values[i];
+    beginCash += mn + CF_INVESTING[i] + CF_FINANCING[i];
+  }
+  const endCash = beginCash + operatingCash + investingCash + financingCash;
+
+  // KPI cards
+  document.getElementById('kpiIncome').textContent   = usd(totalIncome);
+  document.getElementById('kpiExpenses').textContent = usd(totalExpenses);
+  document.getElementById('kpiNet').textContent      = usdAcct(netIncome);
+  document.getElementById('kpiCash').textContent     = usd(endCash);
+
+  // Bar chart
+  barChart.data.labels = months;
+  barChart.data.datasets[0].data = incomeArr;
+  barChart.data.datasets[1].data = expArr;
+  barChart.update();
+
+  // Line chart (cumulative net)
+  const cumNet = []; let running = 0;
+  for (let i = 0; i < incomeArr.length; i++) { running += incomeArr[i] - expArr[i]; cumNet.push(running); }
+  lineChart.data.labels = months;
+  lineChart.data.datasets[0].data = cumNet;
+  lineChart.update();
+
+  // Expense pie (4000-series, positive totals only)
+  const expPieLabels = [], expPieData = [];
+  for (const a of EXP_4000) {
+    let v = 0; for (let i = s; i <= e; i++) v += a.values[i];
+    if (v > 0) { expPieLabels.push(a.name); expPieData.push(v); }
+  }
+  expPie.data.labels = expPieLabels;
+  expPie.data.datasets[0].data = expPieData;
+  expPie.update();
+
+  // Income pie
+  const incPieLabels = [], incPieData = [];
+  for (const a of INCOME_ACCOUNTS) {
+    if (!showInvest && a.investProp) continue;
+    let v = 0; for (let i = s; i <= e; i++) v += a.values[i];
+    if (v > 0) { incPieLabels.push(a.name); incPieData.push(v); }
+  }
+  incPie.data.labels = incPieLabels;
+  incPie.data.datasets[0].data = incPieData;
+  incPie.update();
+
+  buildPLTable(s, e, showInvest);
+  buildCashFlow(s, e, operatingCash, investingCash, financingCash, beginCash, endCash);
+}
+
+// ── P&L Table ───────────────────────────────────────────────────────────────
+function buildPLTable(s, e, showInvest) {
+  const cols = [];
+  for (let i = s; i <= e; i++) cols.push(i);
+  const showTotal = cols.length > 1;
+  const colCount  = cols.length + 1 + (showTotal ? 1 : 0); // account col + month cols + total
+
+  const startDate = MONTHS[s].start, endDate = MONTHS[e].end;
+  const qboUrl = `https://app.qbo.intuit.com/app/profitandloss?start_date=${startDate}&end_date=${endDate}&column=total`;
+
+  // Header
+  let hHtml = '<tr><th style="text-align:left;width:240px">Account</th>';
+  for (const i of cols) hHtml += `<th>${MONTHS[i].short}</th>`;
+  if (showTotal) hHtml += '<th>Total</th>';
+  hHtml += '</tr>';
+  document.getElementById('plHead').innerHTML = hHtml;
+
+  const makeRow = (name, vals, rowClass, investClass, dblClick) => {
+    const total = vals.reduce((a,b)=>a+b,0);
+    if (!rowClass.includes('section-total') && !rowClass.includes('net-row')) {
+      if (vals.every(v=>v===0) && total===0) return '';
+    }
+    let cls = rowClass;
+    if (investClass) cls += ' ' + investClass;
+    const dc = dblClick ? `ondblclick="window.open('${qboUrl}','_blank')"` : '';
+    let r = `<tr class="${cls}" ${dc}><td>${name}</td>`;
+    for (const v of vals) r += `<td>${usdAcct(v)}</td>`;
+    if (showTotal) r += `<td><strong>${usdAcct(total)}</strong></td>`;
+    r += '</tr>';
+    return r;
+  };
+
+  let body = '';
+  const investHide = showInvest ? '' : 'invest-hidden';
+
+  // ── Income ──
+  body += `<tr class="section-header" id="sh-income" onclick="toggleSection('inc-row','sh-income')"><td colspan="${colCount}">Income (3000s)</td></tr>`;
+  const incTotals = new Array(cols.length).fill(0);
+  for (const a of INCOME_ACCOUNTS) {
+    if (!showInvest && a.investProp) continue;
+    const vals = cols.map(i => a.values[i]);
+    vals.forEach((v,j) => incTotals[j] += v);
+    body += makeRow(a.name, vals, 'inc-row', a.investProp ? investHide : '', true);
+  }
+  body += makeRow('<strong>Total Income</strong>', incTotals, 'section-total inc-row', '', false);
+
+  // ── 4000 Expenses ──
+  body += `<tr class="section-header" id="sh-4000" onclick="toggleSection('exp4-row','sh-4000')"><td colspan="${colCount}">4000 Personal Expenses</td></tr>`;
+  const exp4Totals = new Array(cols.length).fill(0);
+  for (const a of EXP_4000) {
+    const vals = cols.map(i => a.values[i]);
+    vals.forEach((v,j) => exp4Totals[j] += v);
+    body += makeRow(a.name, vals, 'exp4-row', '', true);
+  }
+  body += makeRow('<strong>Total Personal Expenses</strong>', exp4Totals, 'section-total exp4-row', '', false);
+
+  // ── 5000 Investment Property ──
+  body += `<tr class="section-header ${investHide}" id="sh-5000" onclick="toggleSection('exp5-row','sh-5000')"><td colspan="${colCount}">5000 Investment Property Expenses</td></tr>`;
+  const exp5Totals = new Array(cols.length).fill(0);
+  for (const a of EXP_5000) {
+    const vals = cols.map(i => a.values[i]);
+    vals.forEach((v,j) => exp5Totals[j] += v);
+    body += makeRow(a.name, vals, 'exp5-row', investHide, true);
+  }
+  body += makeRow('<strong>Total Property Expenses</strong>', exp5Totals, `section-total exp5-row ${investHide}`, '', false);
+
+  // ── Net Income ──
+  const netVals = cols.map((ci, j) => incTotals[j] - exp4Totals[j] - (showInvest ? exp5Totals[j] : 0));
+  body += makeRow('Net Income', netVals, 'net-row', '', false);
+
+  document.getElementById('plBody').innerHTML = body;
+}
+
+function toggleSection(cls, headerId) {
+  const rows = document.querySelectorAll('.' + cls);
+  const hdr  = document.getElementById(headerId);
+  const isCollapsed = hdr.classList.contains('collapsed');
+  rows.forEach(r => {
+    if (isCollapsed) r.classList.remove('hidden');
+    else r.classList.add('hidden');
   });
-}
-
-function buildExpensePie(s, e) {
-  const labels=[], vals=[];
-  for (const a of PERS_ACCTS) {
-    let t=0; for (let i=s; i<=e; i++) t += PERS[i][a.id]||0;
-    if (t > 0) { labels.push(a.name); vals.push(t); }
-  }
-  if (expensePie) expensePie.destroy();
-  if (vals.length) expensePie = makePieChart('expensePie', labels, vals, PIE_COLORS_EXP);
-}
-
-function buildIncomePie(s, e, si) {
-  const labels=[], vals=[];
-  for (const a of INC_ACCTS) {
-    if (a.invest && !si) continue;
-    let t=0; for (let i=s; i<=e; i++) t += INC[i][a.id]||0;
-    if (t > 0) { labels.push(a.name); vals.push(t); }
-  }
-  if (incomePie) incomePie.destroy();
-  if (vals.length) incomePie = makePieChart('incomePie', labels, vals, PIE_COLORS_INC);
-}
-
-// ── P&L TABLE ─────────────────────────────────────────────────────────────────
-function buildTable(s, e, si) {
-  const cols = MONTHS.slice(s, e+1);
-  const sd = MONTHS[s].start, ed = MONTHS[e].end;
-  const dlAttr = 'ondblclick="window.open(\'https://app.qbo.intuit.com/app/profitandloss?start_date=' + sd + '&end_date=' + ed + '&column=total\',\'_blank\')"';
-
-  document.getElementById('plHead').innerHTML =
-    '<tr><th>Account</th>' + cols.map(m => '<th>' + m.label + '</th>').join('') + '<th>Total</th></tr>';
-
-  const rows = [];
-
-  function addSection(label, grp) {
-    rows.push('<tr class="sec-hdr" onclick="toggleGrp(this,\'' + grp + '\')" ' + dlAttr + '><td colspan="' + (cols.length+2) + '">' + label + '</td></tr>');
-  }
-  function addSubRow(name, vals, grp) {
-    const tot = vals.reduce((a,b)=>a+b, 0);
-    if (vals.every(v=>v===0)) return;
-    rows.push('<tr class="sub-row ' + grp + '" ' + dlAttr + '><td>' + name + '</td>' +
-      vals.map(v => '<td class="' + cls(v) + '">' + (v===0 ? '&mdash;' : usd(v)) + '</td>').join('') +
-      '<td class="' + cls(tot) + '">' + usd(tot) + '</td></tr>');
-  }
-  function addTotalRow(label, vals, grp) {
-    const tot = vals.reduce((a,b)=>a+b, 0);
-    rows.push('<tr class="sec-total ' + grp + '" ' + dlAttr + '><td>' + label + '</td>' +
-      vals.map(v => '<td class="' + cls(v) + '">' + usd(v) + '</td>').join('') +
-      '<td class="' + cls(tot) + '">' + usd(tot) + '</td></tr>');
-  }
-
-  // Income
-  addSection('Income', 'grp-inc');
-  for (const a of INC_ACCTS) {
-    if (a.invest && !si) continue;
-    addSubRow(a.name, cols.map((_,k) => INC[s+k][a.id]||0), 'grp-inc');
-  }
-  const incCols = cols.map((_,k) => { let t=0; for(const a of INC_ACCTS){ if(a.invest&&!si) continue; t+=INC[s+k][a.id]||0; } return t; });
-  addTotalRow('Total Income', incCols, 'grp-inc');
-
-  // Personal Expenses
-  addSection('Personal Expenses (4000s)', 'grp-pers');
-  for (const a of PERS_ACCTS) addSubRow(a.name, cols.map((_,k) => PERS[s+k][a.id]||0), 'grp-pers');
-  const persCols = cols.map((_,k) => { let t=0; for(const a of PERS_ACCTS) t+=PERS[s+k][a.id]||0; return t; });
-  addTotalRow('Total Personal Expenses', persCols, 'grp-pers');
-
-  // Investment Property Expenses
-  if (si) {
-    addSection('Investment Property Expenses (5000s)', 'grp-inv');
-    for (const a of INV_ACCTS) addSubRow(a.name, cols.map((_,k) => INVEST[s+k][a.id]||0), 'grp-inv');
-    const invCols = cols.map((_,k) => { let t=0; for(const a of INV_ACCTS) t+=INVEST[s+k][a.id]||0; return t; });
-    addTotalRow('Total Investment Property Expenses', invCols, 'grp-inv');
-  }
-
-  // Net Income
-  const netCols = cols.map((_,k) => monthTotals(s+k, si).net);
-  const netTot  = netCols.reduce((a,b)=>a+b, 0);
-  rows.push('<tr class="grand-total" ' + dlAttr + '><td>Net Income</td>' +
-    netCols.map(v => '<td style="color:' + (v>=0?'#86efac':'#fca5a5') + '">' + usd(v) + '</td>').join('') +
-    '<td style="color:' + (netTot>=0?'#86efac':'#fca5a5') + '">' + usd(netTot) + '</td></tr>');
-
-  document.getElementById('plBody').innerHTML = rows.join('');
-}
-
-function toggleGrp(hdr, grp) {
   hdr.classList.toggle('collapsed');
-  document.querySelectorAll('.' + grp).forEach(r => r.classList.toggle('hidden-row'));
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
-update();
+// ── Cash Flow Statement ──────────────────────────────────────────────────────
+function buildCashFlow(s, e, operatingCash, investingCash, financingCash, beginCash, endCash) {
+  // Title — parse manually to avoid UTC timezone shift
+  const [sy, sm]     = MONTHS[s].start.split('-').map(Number);
+  const [ey, em, ed] = MONTHS[e].end.split('-').map(Number);
+  const startLabel = `${MONTH_NAMES[sm-1]} 1`;
+  const endLabel   = `${MONTH_NAMES[em-1]} ${ed}`;
+  const yearPart   = sy === ey ? `, ${sy}` : `, ${sy}–${ey}`;
+  document.getElementById('cfTitle').textContent =
+    `Statement of Cash Flows — ${startLabel} – ${endLabel}${yearPart}`;
+
+  const netIncrease = operatingCash + investingCash + financingCash;
+
+  const row = (label, val, cls, indent) =>
+    `<tr class="${cls}"><td${indent?' class="indent"':''}>${label}</td><td>${usdAcct(val)}</td></tr>`;
+  const secRow = (label) =>
+    `<tr class="cf-section"><td>${label}</td><td></td></tr>`;
+
+  let html = '';
+  html += secRow('Operating Activities');
+  html += row('Net Income', operatingCash, '', true);
+  html += row('Net cash provided by operating activities', operatingCash, 'cf-total', false);
+
+  html += secRow('Investing Activities');
+  html += row('Net cash provided by investing activities', investingCash, 'cf-total', false);
+
+  html += secRow('Financing Activities');
+  html += row('Opening balance / loan proceeds', financingCash, '', true);
+  html += row('Net cash provided by financing activities', financingCash, 'cf-total', false);
+
+  html += row('Net Cash Increase for Period', netIncrease, 'cf-total', false);
+  html += row('Cash at beginning of period', beginCash, '', false);
+  html += row('Cash at End of Period', endCash, 'cf-grand', false);
+
+  document.getElementById('cfTable').innerHTML = html;
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+buildCharts();
+updateDashboard();
+document.getElementById('startMonth').addEventListener('change', updateDashboard);
+document.getElementById('endMonth').addEventListener('change', updateDashboard);
+document.getElementById('investToggle').addEventListener('change', updateDashboard);
 </script>
 </body>
 </html>
