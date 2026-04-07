@@ -224,78 +224,78 @@ table.cf-table tr.cf-total td { font-weight: 700; border-top: 2px solid #999; }
 </div>
 
 <script>
-// ─── DATA ────────────────────────────────────────────────────────────────
-const months = ['Jan 2026','Feb 2026','Mar 2026','Apr 2026'];
-const monthDates = [
+// --- DATA ----------------------------------------------------------------
+var months = ['Jan 2026','Feb 2026','Mar 2026','Apr 2026'];
+var monthDates = [
   {start:'2026-01-01',end:'2026-01-31'},
   {start:'2026-02-01',end:'2026-02-28'},
   {start:'2026-03-01',end:'2026-03-31'},
   {start:'2026-04-01',end:'2026-04-06'}
 ];
 
-const incomeAccounts = [
-  {code:'3001',name:'W2 Income',            values:[7948.39,7948.40,7948.40,3980.78]},
-  {code:'3002',name:'Side Work Income',     values:[2157.06,1741.59,2872.60,0]},
-  {code:'3003',name:'Interest Income',      values:[642.99,524.21,506.53,0]},
-  {code:'3004',name:'Rental Property Income',values:[6722.32,7854.22,5164.56,0]},
-  {code:'3005',name:'Additional Taxes Owed',values:[0,0,-801.64,0]},
-  {code:'3006',name:'Gifts from Others',    values:[482.00,0,1247.00,0]}
+var incomeAccounts = [
+  {code:'3001',name:'W2 Income',              values:[7948.39, 7948.40, 7948.40, 3980.78]},
+  {code:'3002',name:'Side Work Income',       values:[2157.06, 1741.59, 2872.60, 0]},
+  {code:'3003',name:'Interest Income',        values:[642.99, 524.21, 506.53, 0]},
+  {code:'3004',name:'Rental Property Income', values:[6722.32, 7854.22, 5164.56, 0]},
+  {code:'3005',name:'Additional Taxes Owed',  values:[0, 0, -801.64, 0]},
+  {code:'3006',name:'Gifts from Others',      values:[482.00, 0, 1247.00, 0]}
 ];
 
-const personalExpenses = [
-  {code:'4001',name:'Groceries',                values:[721.63,667.02,715.12,0]},
-  {code:'4002',name:'Dining Out',               values:[123.93,137.98,128.40,0]},
-  {code:'4003',name:'Entertainment',             values:[45.97,191.80,21.99,0]},
-  {code:'4004',name:'Home',                      values:[0,0,0,0]},
-  {code:'4005',name:'Medical',                   values:[297.75,647.06,292.41,0]},
-  {code:'4006',name:'Personal Care / Clothing',  values:[0,0,0,0]},
-  {code:'4007',name:'Subscriptions',             values:[0,0,0,0]},
-  {code:'4008',name:'Transportation',            values:[403.32,753.65,1778.00,1.85]},
-  {code:'4009',name:'Travel',                    values:[0,90.66,-326.17,0]},
-  {code:'4010',name:'Utilities',                 values:[0,0,0,0]},
-  {code:'4011',name:'Kids',                      values:[337.50,0,61.25,0]},
-  {code:'4012',name:'Pets',                      values:[0,0,0,0]},
-  {code:'4013',name:'Taxes',                     values:[0,0,0,0]},
-  {code:'4014',name:'Misc. Expenses',            values:[162.38,282.93,-10.18,0]}
+var personalExpenses = [
+  {code:'4001',name:'Groceries',               values:[721.63, 667.02, 715.12, 0]},
+  {code:'4002',name:'Dining Out',              values:[7123.93, 137.98, 128.40, 0]},
+  {code:'4003',name:'Entertainment',           values:[45.97, 191.80, 21.99, 0]},
+  {code:'4004',name:'Home',                    values:[0, 0, 0, 0]},
+  {code:'4005',name:'Medical',                 values:[297.75, 647.06, 292.41, 0]},
+  {code:'4006',name:'Personal Care / Clothing',values:[0, 0, 0, 0]},
+  {code:'4007',name:'Subscriptions',           values:[0, 0, 0, 0]},
+  {code:'4008',name:'Transportation',          values:[403.32, 753.65, 1778.00, 1.85]},
+  {code:'4009',name:'Travel',                  values:[0, 90.66, -326.17, 0]},
+  {code:'4010',name:'Utilities',               values:[0, 0, 0, 0]},
+  {code:'4011',name:'Kids',                    values:[337.50, 0, 61.25, 0]},
+  {code:'4012',name:'Pets',                    values:[0, 0, 0, 0]},
+  {code:'4013',name:'Taxes',                   values:[0, 0, 0, 0]},
+  {code:'4014',name:'Misc. Expenses',          values:[162.38, 282.93, -10.18, 0]}
 ];
 
-const investExpenses = [
-  {code:'5001',name:'Mortgage / Rent',          values:[8616.30,4524.20,1446.03,4507.09]},
-  {code:'5002',name:'Property Tax',             values:[0,4123.26,0,0]},
-  {code:'5003',name:'Insurance',                values:[98.83,98.83,98.83,98.83]},
-  {code:'5004',name:'Repairs & Maintenance',    values:[13173.33,17528.72,14.80,3000.00]},
-  {code:'5005',name:'Property Management',      values:[0,0,0,0]},
-  {code:'5006',name:'Utilities',                values:[346.85,2666.77,2456.61,284.68]},
-  {code:'5007',name:'HOA Fees',                 values:[0,0,0,0]},
-  {code:'5008',name:'Landscaping',              values:[0,0,0,0]},
-  {code:'5009',name:'Vacancy / Turnover',       values:[0,0,0,0]},
-  {code:'5010',name:'Misc. Property Expenses',  values:[0,0,77.41,0]}
+var investExpenses = [
+  {code:'5001',name:'Mortgage / Rent',         values:[8616.30, 4524.20, 1446.03, 4507.09]},
+  {code:'5002',name:'Property Tax',            values:[0, 4123.26, 0, 0]},
+  {code:'5003',name:'Insurance',               values:[98.83, 98.83, 98.83, 98.83]},
+  {code:'5004',name:'Repairs & Maintenance',   values:[13173.33, 17528.72, 14.80, 3000.00]},
+  {code:'5005',name:'Property Management',     values:[0, 0, 0, 0]},
+  {code:'5006',name:'Utilities',               values:[346.85, 2666.77, 2456.61, 284.68]},
+  {code:'5007',name:'HOA Fees',                values:[0, 0, 0, 0]},
+  {code:'5008',name:'Landscaping',             values:[0, 0, 0, 0]},
+  {code:'5009',name:'Vacancy / Turnover',      values:[0, 0, 0, 0]},
+  {code:'5010',name:'Misc. Property Expenses', values:[0, 0, 77.41, 0]}
 ];
 
-const cashFlow = {
-  operating: -9123.90,
+var cashFlow = {
+  operating: -16123.90,
   investing: 0,
   financing: 291321.67,
-  netIncrease: 282197.77,
+  netIncrease: 275197.77,
   cashBeginning: 108.00,
-  cashEnd: 282305.77
+  cashEnd: 275305.77
 };
 
-// ─── HELPERS ─────────────────────────────────────────────────────────────
-const fmt = v => {
-  const neg = v < 0;
-  const s = Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+// --- HELPERS -------------------------------------------------------------
+var fmt = function(v) {
+  var neg = v < 0;
+  var s = Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   return neg ? '(' + s + ')' : s;
 };
-const fmtDollar = v => {
-  const neg = v < 0;
-  const s = '$' + Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+var fmtDollar = function(v) {
+  var neg = v < 0;
+  var s = '$' + Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   return neg ? '(' + s + ')' : s;
 };
 
 function sumRange(arr, s, e) {
-  let t = 0;
-  for (let i = s; i <= e; i++) t += arr[i];
+  var t = 0;
+  for (var i = s; i <= e; i++) t += arr[i];
   return t;
 }
 
@@ -303,22 +303,22 @@ function qboLink(s, e) {
   return 'https://app.qbo.intuit.com/app/profitandloss?start_date=' + monthDates[s].start + '&end_date=' + monthDates[e].end + '&column=total';
 }
 
-// ─── STATE ───────────────────────────────────────────────────────────────
-let startIdx = 0, endIdx = 3, showInvest = true;
-const collapsed = {income: false, personal: false, invest: false};
+// --- STATE ---------------------------------------------------------------
+var startIdx = 0, endIdx = 3, showInvest = true;
+var collapsed = {income: false, personal: false, invest: false};
 
-const startSel = document.getElementById('startMonth');
-const endSel = document.getElementById('endMonth');
-const investToggle = document.getElementById('investToggle');
+var startSel = document.getElementById('startMonth');
+var endSel = document.getElementById('endMonth');
+var investToggle = document.getElementById('investToggle');
 
 startSel.addEventListener('change', function() { startIdx = +startSel.value; if (endIdx < startIdx) { endIdx = startIdx; endSel.value = endIdx; } render(); });
 endSel.addEventListener('change', function() { endIdx = +endSel.value; if (startIdx > endIdx) { startIdx = endIdx; startSel.value = startIdx; } render(); });
 investToggle.addEventListener('change', function() { showInvest = investToggle.checked; render(); });
 
-// ─── CHARTS ──────────────────────────────────────────────────────────────
-let barChart, lineChart, expPie, incPie;
+// --- CHARTS --------------------------------------------------------------
+var barChart, lineChart, expPie, incPie;
 
-const pieColors = ['#2ecc71','#3498db','#e74c3c','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e','#d35400','#c0392b','#16a085','#8e44ad','#2c3e50','#27ae60'];
+var pieColors = ['#2ecc71','#3498db','#e74c3c','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e','#d35400','#c0392b','#16a085','#8e44ad','#2c3e50','#27ae60'];
 
 function initCharts() {
   barChart = new Chart(document.getElementById('barChart'), {
@@ -417,7 +417,7 @@ function initCharts() {
   });
 }
 
-// ─── RENDER ──────────────────────────────────────────────────────────────
+// --- RENDER --------------------------------------------------------------
 function render() {
   var s = startIdx, e = endIdx;
   var visMonths = months.slice(s, e + 1);
@@ -513,7 +513,7 @@ function render() {
   incPie.data.datasets = [{ data: incData, backgroundColor: incColors }];
   incPie.update();
 
-  // ─── P&L Table ─────────────────────────────────────────────────────────
+  // --- P&L Table ---------------------------------------------------------
   var table = document.getElementById('plTable');
   var colSpan = visMonths.length + 2;
   var link = qboLink(s, e);
@@ -603,7 +603,7 @@ function render() {
   document.getElementById('cfEnd').textContent = fmtDollar(cashFlow.cashEnd);
 }
 
-// ─── INIT ────────────────────────────────────────────────────────────────
+// --- INIT ----------------------------------------------------------------
 initCharts();
 render();
 </script>
