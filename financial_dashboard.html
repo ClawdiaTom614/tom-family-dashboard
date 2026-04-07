@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tom Family Financial Dashboard â 2026</title>
+<title>Tom Family Financial Dashboard &mdash; 2026</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -58,8 +58,8 @@
   .pl-table .positive { color: #22c55e; }
   .expand-icon { margin-right: 6px; display: inline-block; transition: transform 0.2s; font-size: 0.7rem; }
   .collapsed .expand-icon { transform: rotate(-90deg); }
-  .qbo-link { cursor: pointer; }
-  .qbo-link:hover { text-decoration: underline; color: #6366f1; }
+  .qbo-btn { display: inline-flex; align-items: center; gap: 6px; background: #2ca01c; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.8rem; font-weight: 600; cursor: pointer; text-decoration: none; }
+  .qbo-btn:hover { background: #238c14; }
   .cf-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 24px; }
   .cf-card h3 { font-size: 0.85rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
   .cf-grid { display: grid; grid-template-columns: repeat(3, 1fr) 1px repeat(2, 1fr); gap: 0; }
@@ -84,10 +84,13 @@
 
 <div class="header">
   <div>
-    <h1>ð  Tom Family Financial Dashboard</h1>
-    <div class="subtitle">Personal Life Â· QuickBooks Online</div>
+    <h1> Tom Family Financial Dashboard</h1>
+    <div class="subtitle">Personal Life &middot; QuickBooks Online</div>
   </div>
-  <div class="updated">Updated: April 6, 2026</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="updated">Updated: April 6, 2026</div>
+    <a class="qbo-btn" href="https://qbo.intuit.com/app/report/builder?rptId=sbg:c46c823a-8641-4641-b08a-dda0e499066f&type=system&token=PANDL" target="_blank">Open in QuickBooks</a>
+  </div>
 </div>
 
 <div class="controls">
@@ -108,11 +111,11 @@
     </select>
   </label>
   <div class="toggle-wrap">
-    <span class="toggle-label">Investment Properties</span>
     <label class="toggle">
       <input type="checkbox" id="investToggle" checked onchange="updateDashboard()">
       <span class="slider"></span>
     </label>
+    <span class="toggle-label">Investment Properties</span>
   </div>
 </div>
 
@@ -121,15 +124,15 @@
   <div class="kpi-grid">
     <div class="kpi-card green">
       <div class="kpi-label">Total Income</div>
-      <div class="kpi-value" id="kpiIncome">â</div>
+      <div class="kpi-value" id="kpiIncome">&mdash;</div>
     </div>
     <div class="kpi-card red">
       <div class="kpi-label">Total Expenses</div>
-      <div class="kpi-value" id="kpiExpenses">â</div>
+      <div class="kpi-value" id="kpiExpenses">&mdash;</div>
     </div>
     <div class="kpi-card" id="kpiNetCard">
       <div class="kpi-label">Net Income</div>
-      <div class="kpi-value" id="kpiNet">â</div>
+      <div class="kpi-value" id="kpiNet">&mdash;</div>
     </div>
     <div class="kpi-card blue">
       <div class="kpi-label">Cash at End of Period</div>
@@ -171,7 +174,7 @@
 
   <!-- P&L Table -->
   <div class="pl-card">
-    <h3>Profit &amp; Loss â Detail View <span style="font-size:0.75rem;color:#94a3b8;font-weight:400;text-transform:none;">(double-click row to open in QuickBooks)</span></h3>
+    <h3>Profit &amp; Loss &mdash; Detail View</h3>
     <div style="overflow-x:auto">
       <table class="pl-table" id="plTable">
         <thead id="plHead"></thead>
@@ -182,7 +185,7 @@
 
   <!-- Cash Flow -->
   <div class="cf-card">
-    <h3>Statement of Cash Flows â Jan 1 â Apr 6, 2026</h3>
+    <h3>Statement of Cash Flows &mdash; Jan 1 - Apr 6, 2026</h3>
     <div class="cf-grid">
       <div class="cf-item">
         <div class="cf-item-label">Operating Activities</div>
@@ -213,12 +216,12 @@
   </div>
 </div>
 
-<div class="footer">Tom Family Financial Dashboard Â· Data from QuickBooks Online (Personal Life) Â· Generated April 6, 2026</div>
+<div class="footer">Tom Family Financial Dashboard &middot; Data from QuickBooks Online (Personal Life) &middot; Generated April 6, 2026</div>
 
 <script>
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 // DATA
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 const months = ['Jan 2026', 'Feb 2026', 'Mar 2026', 'Apr 2026'];
 const periods = [
   { start: '2026-01-01', end: '2026-01-31' },
@@ -305,7 +308,7 @@ const rawData = [
       '5005 Utilities': 2456.61,
     },
   },
-  // Apr 2026 (Apr 1â6)
+  // Apr 2026 (Apr 1-6)
   {
     income: {
       '3001 W2 Income': 3980.78,
@@ -323,11 +326,11 @@ const rawData = [
 // Chart instances
 let barChart, lineChart, expPieChart, incPieChart;
 
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 // HELPERS
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 const fmt = (v) => {
-  if (v === 0) return 'â';
+  if (v === 0) return '-';
   const abs = Math.abs(v);
   const str = abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   return v < 0 ? `-$${str}` : `$${str}`;
@@ -350,9 +353,9 @@ function showInvest() {
   return document.getElementById('investToggle').checked;
 }
 
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 // MAIN UPDATE
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 function updateDashboard() {
   const data = getFilteredData();
   const invest = showInvest();
@@ -365,9 +368,9 @@ function updateDashboard() {
   buildPLTable(data, invest);
 }
 
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 // KPIs
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 function updateKPIs(data, invest) {
   let totalIncome = 0, totalExpenses = 0;
   data.forEach(d => {
@@ -388,9 +391,9 @@ function updateKPIs(data, invest) {
   card.className = 'kpi-card ' + (net >= 0 ? 'green' : 'red');
 }
 
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 // BAR CHART
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 function updateBarChart(data, invest) {
   const labels = data.map(d => months[d.monthIdx]);
   const incomes = data.map(d => {
@@ -426,9 +429,9 @@ function updateBarChart(data, invest) {
   });
 }
 
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 // LINE CHART
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 function updateLineChart(data, invest) {
   const labels = data.map(d => months[d.monthIdx]);
   let cumulative = 0;
@@ -472,9 +475,9 @@ function updateLineChart(data, invest) {
   });
 }
 
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 // EXPENSE PIE (personal only)
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 function updateExpPie(data) {
   const totals = {};
   data.forEach(d => {
@@ -528,9 +531,9 @@ function updateExpPie(data) {
   });
 }
 
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 // INCOME PIE
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 function updateIncPie(data, invest) {
   const totals = {};
   data.forEach(d => {
@@ -584,9 +587,9 @@ function updateIncPie(data, invest) {
   });
 }
 
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 // P&L TABLE
-// âââââââââââââââââââââââââââââââââââââââââ
+// -----------------------------------------
 function buildPLTable(data, invest) {
   const head = document.getElementById('plHead');
   const body = document.getElementById('plBody');
@@ -607,13 +610,11 @@ function buildPLTable(data, invest) {
   const s = Math.min(startIdx, endIdx);
   const qboStart = periods[s].start;
   const qboEnd = periods[Math.max(startIdx, endIdx)].end;
-  const qboLink = `https://app.qbo.intuit.com/app/profitandloss?start_date=${qboStart}&end_date=${qboEnd}&column=total`;
-
   function addRow(cls, label, vals, extra = '') {
     const totalVal = vals.reduce((a,b) => a+b, 0);
-    const cells = vals.map(v => `<td class="${v < 0 ? 'negative' : ''}">${v !== 0 ? fmt(v) : 'â'}</td>`).join('');
+    const cells = vals.map(v => `<td class="${v < 0 ? 'negative' : ''}">${v !== 0 ? fmt(v) : '-'}</td>`).join('');
     const totalCell = showTotal ? `<td class="${totalVal < 0 ? 'negative' : ''}" style="border-left:2px solid #e2e8f0;font-weight:600">${fmt(totalVal)}</td>` : '';
-    rows.push(`<tr class="${cls} qbo-link" ondblclick="window.open('${qboLink}','_blank')" title="Double-click to open in QuickBooks"${extra}><td>${label}</td>${cells}${totalCell}</tr>`);
+    rows.push(`<tr class="${cls}"${extra}><td>${label}</td>${cells}${totalCell}</tr>`);
   }
 
   function sectionRows(sectionLabel, sectionKey, cls5000 = false) {
@@ -641,7 +642,7 @@ function buildPLTable(data, invest) {
       keyVals.forEach((v, i) => sectionTotals[i] += v);
 
       if (isGroup) {
-        addRow('sub-row section-header', `<span class="expand-icon">â¼</span>${key}`, keyVals, ` data-group="${sectionKey}-${key}"`);
+        addRow('sub-row section-header', `<span class="expand-icon">&#x25BC;</span>${key}`, keyVals, ` data-group="${sectionKey}-${key}"`);
         // Sub-rows
         const allSubKeys = new Set();
         data.forEach(d => {
@@ -671,13 +672,13 @@ function buildPLTable(data, invest) {
     return sectionTotals;
   }
 
-  // ââ INCOME ââ
+  // -- INCOME --
   const incTotals = Array(n).fill(0);
   const allIncKeys = new Set();
   data.forEach(d => Object.keys(d.income).forEach(k => allIncKeys.add(k)));
 
   // Section header
-  rows.push(`<tr class="section-header" data-group="income-section" onclick="toggleSection('income-section', this)"><td colspan="${n + (showTotal?2:1)}" style="padding:10px 12px"><span class="expand-icon">â¼</span><strong>ð INCOME</strong></td></tr>`);
+  rows.push(`<tr class="section-header" data-group="income-section" onclick="toggleSection('income-section', this)"><td colspan="${n + (showTotal?2:1)}" style="padding:10px 12px"><span class="expand-icon">&#x25BC;</span><strong> INCOME</strong></td></tr>`);
 
   allIncKeys.forEach(k => {
     if (!invest && k === '3004 Rental Property Income') return;
@@ -692,15 +693,15 @@ function buildPLTable(data, invest) {
   // Spacer
   rows.push(`<tr><td colspan="${n + (showTotal?2:1)}" style="height:8px;background:#f8fafc"></td></tr>`);
 
-  // ââ PERSONAL EXPENSES ââ
-  rows.push(`<tr class="section-header" data-group="personal-section" onclick="toggleSection('personal-section', this)"><td colspan="${n + (showTotal?2:1)}" style="padding:10px 12px"><span class="expand-icon">â¼</span><strong>ð  PERSONAL EXPENSES (4000s)</strong></td></tr>`);
+  // -- PERSONAL EXPENSES --
+  rows.push(`<tr class="section-header" data-group="personal-section" onclick="toggleSection('personal-section', this)"><td colspan="${n + (showTotal?2:1)}" style="padding:10px 12px"><span class="expand-icon">&#x25BC;</span><strong> PERSONAL EXPENSES (4000s)</strong></td></tr>`);
   const pTotals = sectionRows('Personal Expenses', 'personal');
 
   rows.push(`<tr><td colspan="${n + (showTotal?2:1)}" style="height:8px;background:#f8fafc"></td></tr>`);
 
-  // ââ INVESTMENT PROPERTY EXPENSES ââ
+  // -- INVESTMENT PROPERTY EXPENSES --
   if (invest) {
-    rows.push(`<tr class="section-header" data-group="invest-section" onclick="toggleSection('invest-section', this)"><td colspan="${n + (showTotal?2:1)}" style="padding:10px 12px"><span class="expand-icon">â¼</span><strong>ð¢ INVESTMENT PROPERTY EXPENSES (5000s)</strong></td></tr>`);
+    rows.push(`<tr class="section-header" data-group="invest-section" onclick="toggleSection('invest-section', this)"><td colspan="${n + (showTotal?2:1)}" style="padding:10px 12px"><span class="expand-icon">&#x25BC;</span><strong> INVESTMENT PROPERTY EXPENSES (5000s)</strong></td></tr>`);
     const iTotals = sectionRows('Investment Property Expenses', 'invest', true);
     rows.push(`<tr><td colspan="${n + (showTotal?2:1)}" style="height:8px;background:#f8fafc"></td></tr>`);
 
