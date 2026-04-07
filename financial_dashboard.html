@@ -3,594 +3,412 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tom Family Financial Dashboard &mdash; 2026</title>
+<title>Tom Family Financial Dashboard - 2026</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a1a2e; }
-  .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 20px 30px; display: flex; align-items: center; justify-content: space-between; }
-  .header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; }
-  .header .subtitle { font-size: 0.8rem; opacity: 0.7; margin-top: 2px; }
-  .header .updated { font-size: 0.75rem; opacity: 0.6; }
-  .controls { background: white; padding: 14px 30px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-  .controls label { font-size: 0.8rem; color: #64748b; font-weight: 500; }
-  .controls select { border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-size: 0.85rem; color: #1a1a2e; background: white; cursor: pointer; }
-  .toggle-wrap { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-  .toggle-label { font-size: 0.85rem; font-weight: 600; color: #475569; }
-  .toggle { position: relative; width: 44px; height: 24px; }
-  .toggle input { opacity: 0; width: 0; height: 0; }
-  .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #cbd5e1; border-radius: 24px; transition: 0.3s; }
-  .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
-  input:checked + .slider { background: #6366f1; }
-  input:checked + .slider:before { transform: translateX(20px); }
-  .main { padding: 24px 30px; }
-  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-  .kpi-card { background: white; border-radius: 12px; padding: 18px 20px; border-left: 4px solid #6366f1; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-  .kpi-card.green { border-color: #22c55e; }
-  .kpi-card.red { border-color: #ef4444; }
-  .kpi-card.blue { border-color: #3b82f6; }
-  .kpi-card.purple { border-color: #a855f7; }
-  .kpi-label { font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-  .kpi-value { font-size: 1.6rem; font-weight: 700; margin-top: 4px; color: #1a1a2e; }
-  .kpi-value.negative { color: #ef4444; }
-  .kpi-value.positive { color: #22c55e; }
-  .charts-row { display: grid; grid-template-columns: 3fr 2fr; gap: 16px; margin-bottom: 24px; }
-  .charts-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-  .chart-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-  .chart-card h3 { font-size: 0.85rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
-  .chart-container { position: relative; }
-  .pl-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 24px; }
-  .pl-card h3 { font-size: 0.85rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
-  .pl-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-  .pl-table th { text-align: left; padding: 8px 12px; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px; }
-  .pl-table th:not(:first-child) { text-align: right; }
-  .pl-table td { padding: 7px 12px; border-bottom: 1px solid #f1f5f9; }
-  .pl-table td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
-  .pl-table tr.section-header { background: #f8fafc; cursor: pointer; user-select: none; }
-  .pl-table tr.section-header td { font-weight: 700; color: #1a1a2e; font-size: 0.85rem; }
-  .pl-table tr.section-header:hover { background: #f1f5f9; }
-  .pl-table tr.sub-row td:first-child { padding-left: 28px; color: #475569; }
-  .pl-table tr.sub-sub-row td:first-child { padding-left: 48px; color: #64748b; font-size: 0.82rem; }
-  .pl-table tr.total-row td { font-weight: 700; border-top: 2px solid #e2e8f0; background: #f8fafc; }
-  .pl-table tr.grand-total td { font-weight: 800; font-size: 0.9rem; border-top: 3px double #1a1a2e; color: #1a1a2e; }
-  .pl-table tr.collapsible { transition: display 0.2s; }
-  .pl-table .negative { color: #ef4444; }
-  .pl-table .positive { color: #22c55e; }
-  .expand-icon { margin-right: 6px; display: inline-block; transition: transform 0.2s; font-size: 0.7rem; }
-  .collapsed .expand-icon { transform: rotate(-90deg); }
-  .qbo-btn { display: inline-flex; align-items: center; gap: 6px; background: #2ca01c; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.8rem; font-weight: 600; cursor: pointer; text-decoration: none; }
-  .qbo-btn:hover { background: #238c14; }
-  .cf-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 24px; }
-  .cf-card h3 { font-size: 0.85rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
-  .cf-grid { display: grid; grid-template-columns: repeat(3, 1fr) 1px repeat(2, 1fr); gap: 0; }
-  .cf-item { padding: 16px 20px; border-right: 1px solid #f1f5f9; }
-  .cf-divider { background: #e2e8f0; width: 1px; }
-  .cf-item:last-child { border-right: none; }
-  .cf-item-label { font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
-  .cf-item-value { font-size: 1.3rem; font-weight: 700; margin-top: 4px; }
-  .cf-item-value.negative { color: #ef4444; }
-  .cf-item-value.positive { color: #22c55e; }
-  .cf-sep { border-top: 2px solid #e2e8f0; margin: 16px 0; }
-  .footer { text-align: center; padding: 20px; font-size: 0.75rem; color: #94a3b8; }
-  .hidden { display: none; }
-  @media (max-width: 900px) {
-    .kpi-grid { grid-template-columns: 1fr 1fr; }
-    .charts-row, .charts-row-2 { grid-template-columns: 1fr; }
-    .cf-grid { grid-template-columns: 1fr 1fr; }
-  }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f0f2f5;
+  color: #333;
+  line-height: 1.5;
+}
+header {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  color: #fff;
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+header h1 { font-size: 1.5rem; font-weight: 600; }
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.controls label { font-size: 0.85rem; color: #ccc; }
+.controls select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #1e2a45;
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+.toggle-wrap input[type="checkbox"] {
+  width: 18px; height: 18px; cursor: pointer;
+  accent-color: #4ecca3;
+}
+.container { max-width: 1280px; margin: 0 auto; padding: 24px; }
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.kpi-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border-left: 4px solid #ccc;
+}
+.kpi-card.income { border-left-color: #27ae60; }
+.kpi-card.expenses { border-left-color: #e74c3c; }
+.kpi-card.net { border-left-color: #2980b9; }
+.kpi-card.cash { border-left-color: #8e44ad; }
+.kpi-label { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.kpi-value { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.kpi-value.positive { color: #27ae60; }
+.kpi-value.negative { color: #e74c3c; }
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.chart-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.chart-card h3 { font-size: 1rem; margin-bottom: 12px; color: #444; }
+.chart-card canvas { max-height: 320px; }
+.pl-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-bottom: 24px;
+  overflow-x: auto;
+}
+.pl-card h3 { font-size: 1.1rem; margin-bottom: 16px; color: #444; }
+table.pl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.88rem;
+}
+table.pl-table th, table.pl-table td {
+  padding: 8px 12px;
+  text-align: right;
+  border-bottom: 1px solid #eee;
+}
+table.pl-table th:first-child, table.pl-table td:first-child { text-align: left; }
+table.pl-table th { background: #f7f8fa; font-weight: 600; color: #555; position: sticky; top: 0; }
+tr.section-header td {
+  background: #f0f1f3;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+}
+tr.section-header td:first-child { padding-left: 8px; }
+tr.section-header:hover td { background: #e4e6ea; }
+tr.child-row td:first-child { padding-left: 28px; }
+tr.total-row td { font-weight: 700; border-top: 2px solid #ccc; }
+tr.net-row td { font-weight: 700; border-top: 3px double #333; font-size: 0.95rem; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover td { background: #f5f8ff; }
+.cf-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-bottom: 24px;
+}
+.cf-card h3 { font-size: 1.1rem; margin-bottom: 16px; color: #444; }
+table.cf-table {
+  width: 100%; max-width: 500px;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9rem;
+}
+table.cf-table td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+table.cf-table td:last-child { text-align: right; font-weight: 600; }
+table.cf-table tr.cf-total td { font-weight: 700; border-top: 2px solid #999; }
+@media (max-width: 900px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .chart-grid { grid-template-columns: 1fr; }
+  header { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 500px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div>
-    <h1> Tom Family Financial Dashboard</h1>
-    <div class="subtitle">Personal Life &middot; QuickBooks Online</div>
+<header>
+  <h1>Tom Family Financial Dashboard &mdash; 2026</h1>
+  <div class="controls">
+    <div>
+      <label>Start</label>
+      <select id="startMonth">
+        <option value="0">Jan 2026</option>
+        <option value="1">Feb 2026</option>
+        <option value="2">Mar 2026</option>
+        <option value="3">Apr 2026</option>
+      </select>
+    </div>
+    <div>
+      <label>End</label>
+      <select id="endMonth">
+        <option value="0">Jan 2026</option>
+        <option value="1">Feb 2026</option>
+        <option value="2">Mar 2026</option>
+        <option value="3" selected>Apr 2026</option>
+      </select>
+    </div>
+    <div class="toggle-wrap">
+      <input type="checkbox" id="investToggle" checked>
+      <label for="investToggle">Investment Properties</label>
+    </div>
   </div>
-  <div style="display:flex;align-items:center;gap:12px">
-    <div class="updated">Updated: April 6, 2026</div>
-    <a class="qbo-btn" href="https://qbo.intuit.com/app/report/builder?rptId=sbg:c46c823a-8641-4641-b08a-dda0e499066f&type=system&token=PANDL" target="_blank">Open in QuickBooks</a>
-  </div>
-</div>
+</header>
 
-<div class="controls">
-  <label>From:
-    <select id="startMonth" onchange="updateDashboard()">
-      <option value="0">Jan 2026</option>
-      <option value="1">Feb 2026</option>
-      <option value="2">Mar 2026</option>
-      <option value="3">Apr 2026</option>
-    </select>
-  </label>
-  <label>To:
-    <select id="endMonth" onchange="updateDashboard()">
-      <option value="0">Jan 2026</option>
-      <option value="1">Feb 2026</option>
-      <option value="2">Mar 2026</option>
-      <option value="3" selected>Apr 2026</option>
-    </select>
-  </label>
-  <div class="toggle-wrap">
-    <label class="toggle">
-      <input type="checkbox" id="investToggle" checked onchange="updateDashboard()">
-      <span class="slider"></span>
-    </label>
-    <span class="toggle-label">Investment Properties</span>
-  </div>
-</div>
-
-<div class="main">
-  <!-- KPI Cards -->
+<div class="container">
   <div class="kpi-grid">
-    <div class="kpi-card green">
+    <div class="kpi-card income">
       <div class="kpi-label">Total Income</div>
-      <div class="kpi-value" id="kpiIncome">&mdash;</div>
+      <div class="kpi-value" id="kpiIncome">--</div>
     </div>
-    <div class="kpi-card red">
+    <div class="kpi-card expenses">
       <div class="kpi-label">Total Expenses</div>
-      <div class="kpi-value" id="kpiExpenses">&mdash;</div>
+      <div class="kpi-value" id="kpiExpenses">--</div>
     </div>
-    <div class="kpi-card" id="kpiNetCard">
+    <div class="kpi-card net">
       <div class="kpi-label">Net Income</div>
-      <div class="kpi-value" id="kpiNet">&mdash;</div>
+      <div class="kpi-value" id="kpiNet">--</div>
     </div>
-    <div class="kpi-card blue">
+    <div class="kpi-card cash">
       <div class="kpi-label">Cash at End of Period</div>
-      <div class="kpi-value" id="kpiCash">$282,305.77</div>
+      <div class="kpi-value" id="kpiCash">--</div>
     </div>
   </div>
 
-  <!-- Charts Row 1 -->
-  <div class="charts-row">
-    <div class="chart-card">
-      <h3>Monthly Income vs. Expenses</h3>
-      <div class="chart-container" style="height:260px">
-        <canvas id="barChart"></canvas>
-      </div>
-    </div>
-    <div class="chart-card">
-      <h3>Cumulative Net Income</h3>
-      <div class="chart-container" style="height:260px">
-        <canvas id="lineChart"></canvas>
-      </div>
-    </div>
+  <div class="chart-grid">
+    <div class="chart-card"><h3>Monthly Income vs. Expenses</h3><canvas id="barChart"></canvas></div>
+    <div class="chart-card"><h3>Cumulative Net Income</h3><canvas id="lineChart"></canvas></div>
+    <div class="chart-card"><h3>Personal Expenses by Category</h3><canvas id="expPie"></canvas></div>
+    <div class="chart-card"><h3>Income by Source</h3><canvas id="incPie"></canvas></div>
   </div>
 
-  <!-- Charts Row 2 -->
-  <div class="charts-row-2">
-    <div class="chart-card">
-      <h3 id="expPieTitle">Expense Breakdown (Personal)</h3>
-      <div id="expPieContainer" class="chart-container" style="height:280px">
-        <canvas id="expensePieChart"></canvas>
-      </div>
-    </div>
-    <div class="chart-card">
-      <h3>Income by Source</h3>
-      <div class="chart-container" style="height:280px">
-        <canvas id="incomePieChart"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <!-- P&L Table -->
   <div class="pl-card">
-    <h3>Profit &amp; Loss &mdash; Detail View</h3>
-    <div style="overflow-x:auto">
-      <table class="pl-table" id="plTable">
-        <thead id="plHead"></thead>
-        <tbody id="plBody"></tbody>
-      </table>
-    </div>
+    <h3>Profit &amp; Loss Statement</h3>
+    <table class="pl-table" id="plTable"></table>
   </div>
 
-  <!-- Cash Flow -->
   <div class="cf-card">
-    <h3>Statement of Cash Flows &mdash; Jan 1 - Apr 6, 2026</h3>
-    <div class="cf-grid">
-      <div class="cf-item">
-        <div class="cf-item-label">Operating Activities</div>
-        <div class="cf-item-value negative">-$9,123.90</div>
-      </div>
-      <div class="cf-item">
-        <div class="cf-item-label">Investing Activities</div>
-        <div class="cf-item-value">$0.00</div>
-      </div>
-      <div class="cf-item">
-        <div class="cf-item-label">Financing Activities</div>
-        <div class="cf-item-value positive">$291,321.67</div>
-      </div>
-      <div class="cf-divider"></div>
-      <div class="cf-item">
-        <div class="cf-item-label">Net Cash Increase</div>
-        <div class="cf-item-value positive">$282,197.77</div>
-      </div>
-      <div class="cf-item">
-        <div class="cf-item-label">Cash at Beginning</div>
-        <div class="cf-item-value">$108.00</div>
-      </div>
-      <div class="cf-item">
-        <div class="cf-item-label">Cash at End of Period</div>
-        <div class="cf-item-value positive">$282,305.77</div>
-      </div>
-    </div>
+    <h3>Cash Flow Statement (Jan 1 &ndash; Apr 6, 2026)</h3>
+    <table class="cf-table">
+      <tr><td>Operating Activities</td><td id="cfOp"></td></tr>
+      <tr><td>Investing Activities</td><td id="cfInv"></td></tr>
+      <tr><td>Financing Activities</td><td id="cfFin"></td></tr>
+      <tr class="cf-total"><td>Net Increase in Cash</td><td id="cfNet"></td></tr>
+      <tr><td>Cash at Beginning</td><td id="cfBeg"></td></tr>
+      <tr class="cf-total"><td>Cash at End of Period</td><td id="cfEnd"></td></tr>
+    </table>
   </div>
 </div>
-
-<div class="footer">Tom Family Financial Dashboard &middot; Data from QuickBooks Online (Personal Life) &middot; Generated April 6, 2026</div>
 
 <script>
-// -----------------------------------------
-// DATA
-// -----------------------------------------
-const months = ['Jan 2026', 'Feb 2026', 'Mar 2026', 'Apr 2026'];
-const periods = [
-  { start: '2026-01-01', end: '2026-01-31' },
-  { start: '2026-02-01', end: '2026-02-28' },
-  { start: '2026-03-01', end: '2026-03-31' },
-  { start: '2026-04-01', end: '2026-04-06' },
+// ─── DATA ────────────────────────────────────────────────────────────────
+const months = ['Jan 2026','Feb 2026','Mar 2026','Apr 2026'];
+const monthDates = [
+  {start:'2026-01-01',end:'2026-01-31'},
+  {start:'2026-02-01',end:'2026-02-28'},
+  {start:'2026-03-01',end:'2026-03-31'},
+  {start:'2026-04-01',end:'2026-04-06'}
 ];
 
-const rawData = [
-  // Jan 2026
-  {
-    income: {
-      '3001 W2 Income': 7948.39,
-      '3002 Side Work Income': 2157.06,
-      '3003 Interest Income': 642.99,
-      '3004 Rental Property Income': 6722.32,
-      '3006 Gifts from Others': 482.00,
-    },
-    personalExp: {
-      '4001 Food': { '4001.01 Eating Out': 123.93, '4001.02 Groceries': 721.63 },
-      '4002 Medical': 297.75,
-      '4003 Automotive': { '4003.01 Gas & Fuel': 227.97, '4003.03 Vehicle Insurance': 174.00 },
-      '4005 Entertainment': 45.97,
-      '4007 Clothing / Home / Misc': 142.38,
-      '4009 Gifts': 20.00,
-      '4011 Childcare': 337.50,
-    },
-    investExp: {
-      '5001 Mortgages': { '5001.01 Principal Paydown': 8278.80, '5001.02 Mortgage Interest': 337.50 },
-      '5002 Property Insurance': 98.83,
-      '5004 Maintenance': 13173.33,
-      '5005 Utilities': 346.85,
-    },
-  },
-  // Feb 2026
-  {
-    income: {
-      '3001 W2 Income': 7948.40,
-      '3002 Side Work Income': 1741.59,
-      '3003 Interest Income': 524.21,
-      '3004 Rental Property Income': 7854.22,
-    },
-    personalExp: {
-      '4001 Food': { '4001.01 Eating Out': 137.98, '4001.02 Groceries': 667.02 },
-      '4002 Medical': 647.06,
-      '4003 Automotive': { '4003.01 Gas & Fuel': 208.07, '4003.02 Vehicle Maintenance': 150.54, '4003.03 Vehicle Insurance': 395.04 },
-      '4005 Entertainment': 191.80,
-      '4007 Clothing / Home / Misc': 139.48,
-      '4008 Travel': 90.66,
-      '4009 Gifts': 143.45,
-    },
-    investExp: {
-      '5001 Mortgages': { '5001.01 Principal Paydown': 4336.70, '5001.02 Mortgage Interest': 187.50 },
-      '5002 Property Insurance': 98.83,
-      '5003 Property Taxes': 4123.26,
-      '5004 Maintenance': 17528.72,
-      '5005 Utilities': 2666.77,
-    },
-  },
-  // Mar 2026
-  {
-    income: {
-      '3001 W2 Income': 7948.40,
-      '3002 Side Work Income': 2872.60,
-      '3003 Interest Income': 506.53,
-      '3004 Rental Property Income': 5164.56,
-      '3005 Additional Taxes Owed': -801.64,
-      '3006 Gifts from Others': 1247.00,
-    },
-    personalExp: {
-      '4001 Food': { '4001.01 Eating Out': 128.40, '4001.02 Groceries': 715.12 },
-      '4002 Medical': 292.41,
-      '4003 Automotive': { '4003.01 Gas & Fuel': 358.37, '4003.02 Vehicle Maintenance': 1412.58 },
-      '4005 Entertainment': 21.99,
-      '4007 Clothing / Home / Misc': 111.83,
-      '4008 Travel': -326.17,
-      '4009 Gifts': 43.99,
-      '4011 Childcare': 61.25,
-    },
-    investExp: {
-      '5001 Mortgages': { '5001.01 Principal Paydown': 1108.53, '5001.02 Mortgage Interest': 337.50 },
-      '5002 Property Insurance': 98.83,
-      '5004 Maintenance': 14.80,
-      '5005 Utilities': 2456.61,
-    },
-  },
-  // Apr 2026 (Apr 1-6)
-  {
-    income: {
-      '3001 W2 Income': 3980.78,
-    },
-    personalExp: {},
-    investExp: {
-      '5001 Mortgages': { '5001.01 Principal Paydown': 1842.85, '5001.02 Mortgage Interest': 2514.24 },
-      '5002 Property Insurance': 98.83,
-      '5004 Maintenance': 3000.00,
-      '5005 Utilities': 284.68,
-    },
-  },
+const incomeAccounts = [
+  {code:'3001',name:'W2 Income',            values:[7948.39,7948.40,7948.40,3980.78]},
+  {code:'3002',name:'Side Work Income',     values:[2157.06,1741.59,2872.60,0]},
+  {code:'3003',name:'Interest Income',      values:[642.99,524.21,506.53,0]},
+  {code:'3004',name:'Rental Property Income',values:[6722.32,7854.22,5164.56,0]},
+  {code:'3005',name:'Additional Taxes Owed',values:[0,0,-801.64,0]},
+  {code:'3006',name:'Gifts from Others',    values:[482.00,0,1247.00,0]}
 ];
 
-// Chart instances
-let barChart, lineChart, expPieChart, incPieChart;
+const personalExpenses = [
+  {code:'4001',name:'Groceries',                values:[721.63,667.02,715.12,0]},
+  {code:'4002',name:'Dining Out',               values:[123.93,137.98,128.40,0]},
+  {code:'4003',name:'Entertainment',             values:[45.97,191.80,21.99,0]},
+  {code:'4004',name:'Home',                      values:[0,0,0,0]},
+  {code:'4005',name:'Medical',                   values:[297.75,647.06,292.41,0]},
+  {code:'4006',name:'Personal Care / Clothing',  values:[0,0,0,0]},
+  {code:'4007',name:'Subscriptions',             values:[0,0,0,0]},
+  {code:'4008',name:'Transportation',            values:[403.32,753.65,1778.00,1.85]},
+  {code:'4009',name:'Travel',                    values:[0,90.66,-326.17,0]},
+  {code:'4010',name:'Utilities',                 values:[0,0,0,0]},
+  {code:'4011',name:'Kids',                      values:[337.50,0,61.25,0]},
+  {code:'4012',name:'Pets',                      values:[0,0,0,0]},
+  {code:'4013',name:'Taxes',                     values:[0,0,0,0]},
+  {code:'4014',name:'Misc. Expenses',            values:[162.38,282.93,-10.18,0]}
+];
 
-// -----------------------------------------
-// HELPERS
-// -----------------------------------------
-const fmt = (v) => {
-  if (v === 0) return '-';
-  const abs = Math.abs(v);
-  const str = abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  return v < 0 ? `-$${str}` : `$${str}`;
+const investExpenses = [
+  {code:'5001',name:'Mortgage / Rent',          values:[8616.30,4524.20,1446.03,4507.09]},
+  {code:'5002',name:'Property Tax',             values:[0,4123.26,0,0]},
+  {code:'5003',name:'Insurance',                values:[98.83,98.83,98.83,98.83]},
+  {code:'5004',name:'Repairs & Maintenance',    values:[13173.33,17528.72,14.80,3000.00]},
+  {code:'5005',name:'Property Management',      values:[0,0,0,0]},
+  {code:'5006',name:'Utilities',                values:[346.85,2666.77,2456.61,284.68]},
+  {code:'5007',name:'HOA Fees',                 values:[0,0,0,0]},
+  {code:'5008',name:'Landscaping',              values:[0,0,0,0]},
+  {code:'5009',name:'Vacancy / Turnover',       values:[0,0,0,0]},
+  {code:'5010',name:'Misc. Property Expenses',  values:[0,0,77.41,0]}
+];
+
+const cashFlow = {
+  operating: -9123.90,
+  investing: 0,
+  financing: 291321.67,
+  netIncrease: 282197.77,
+  cashBeginning: 108.00,
+  cashEnd: 282305.77
 };
 
-const sumObj = (obj) => {
-  if (typeof obj === 'number') return obj;
-  return Object.values(obj).reduce((a, v) => a + (typeof v === 'object' ? sumObj(v) : v), 0);
+// ─── HELPERS ─────────────────────────────────────────────────────────────
+const fmt = v => {
+  const neg = v < 0;
+  const s = Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return neg ? '(' + s + ')' : s;
+};
+const fmtDollar = v => {
+  const neg = v < 0;
+  const s = '$' + Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return neg ? '(' + s + ')' : s;
 };
 
-function getFilteredData() {
-  const s = parseInt(document.getElementById('startMonth').value);
-  const e = parseInt(document.getElementById('endMonth').value);
-  const start = Math.min(s, e);
-  const end = Math.max(s, e);
-  return rawData.slice(start, end + 1).map((d, i) => ({ ...d, monthIdx: start + i }));
+function sumRange(arr, s, e) {
+  let t = 0;
+  for (let i = s; i <= e; i++) t += arr[i];
+  return t;
 }
 
-function showInvest() {
-  return document.getElementById('investToggle').checked;
+function qboLink(s, e) {
+  return 'https://app.qbo.intuit.com/app/profitandloss?start_date=' + monthDates[s].start + '&end_date=' + monthDates[e].end + '&column=total';
 }
 
-// -----------------------------------------
-// MAIN UPDATE
-// -----------------------------------------
-function updateDashboard() {
-  const data = getFilteredData();
-  const invest = showInvest();
+// ─── STATE ───────────────────────────────────────────────────────────────
+let startIdx = 0, endIdx = 3, showInvest = true;
+const collapsed = {income: false, personal: false, invest: false};
 
-  updateKPIs(data, invest);
-  updateBarChart(data, invest);
-  updateLineChart(data, invest);
-  updateExpPie(data, invest);
-  updateIncPie(data, invest);
-  buildPLTable(data, invest);
-}
+const startSel = document.getElementById('startMonth');
+const endSel = document.getElementById('endMonth');
+const investToggle = document.getElementById('investToggle');
 
-// -----------------------------------------
-// KPIs
-// -----------------------------------------
-function updateKPIs(data, invest) {
-  let totalIncome = 0, totalExpenses = 0;
-  data.forEach(d => {
-    let inc = sumObj(d.income);
-    if (!invest) inc -= (d.income['3004 Rental Property Income'] || 0);
-    let exp = sumObj(d.personalExp);
-    if (invest) exp += sumObj(d.investExp);
-    totalIncome += inc;
-    totalExpenses += exp;
-  });
-  const net = totalIncome - totalExpenses;
-  document.getElementById('kpiIncome').textContent = fmt(totalIncome);
-  document.getElementById('kpiExpenses').textContent = fmt(totalExpenses);
-  const netEl = document.getElementById('kpiNet');
-  netEl.textContent = fmt(net);
-  netEl.className = 'kpi-value ' + (net >= 0 ? 'positive' : 'negative');
-  const card = document.getElementById('kpiNetCard');
-  card.className = 'kpi-card ' + (net >= 0 ? 'green' : 'red');
-}
+startSel.addEventListener('change', function() { startIdx = +startSel.value; if (endIdx < startIdx) { endIdx = startIdx; endSel.value = endIdx; } render(); });
+endSel.addEventListener('change', function() { endIdx = +endSel.value; if (startIdx > endIdx) { startIdx = endIdx; startSel.value = startIdx; } render(); });
+investToggle.addEventListener('change', function() { showInvest = investToggle.checked; render(); });
 
-// -----------------------------------------
-// BAR CHART
-// -----------------------------------------
-function updateBarChart(data, invest) {
-  const labels = data.map(d => months[d.monthIdx]);
-  const incomes = data.map(d => {
-    let v = sumObj(d.income);
-    if (!invest) v -= (d.income['3004 Rental Property Income'] || 0);
-    return Math.max(0, v);
-  });
-  const expenses = data.map(d => {
-    let v = sumObj(d.personalExp);
-    if (invest) v += sumObj(d.investExp);
-    return Math.max(0, v);
-  });
+// ─── CHARTS ──────────────────────────────────────────────────────────────
+let barChart, lineChart, expPie, incPie;
 
-  if (barChart) barChart.destroy();
-  const ctx = document.getElementById('barChart').getContext('2d');
-  barChart = new Chart(ctx, {
+const pieColors = ['#2ecc71','#3498db','#e74c3c','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e','#d35400','#c0392b','#16a085','#8e44ad','#2c3e50','#27ae60'];
+
+function initCharts() {
+  barChart = new Chart(document.getElementById('barChart'), {
     type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Income', data: incomes, backgroundColor: 'rgba(34,197,94,0.8)', borderRadius: 5 },
-        { label: 'Expenses', data: expenses, backgroundColor: 'rgba(239,68,68,0.8)', borderRadius: 5 },
-      ]
-    },
+    data: { labels: [], datasets: [] },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
-      scales: {
-        x: { grid: { display: false } },
-        y: { ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k', font: { size: 10 } }, grid: { color: '#f1f5f9' } }
-      }
+      responsive: true,
+      plugins: { legend: { position: 'top' } },
+      scales: { y: { ticks: { callback: function(v) { return '$' + v.toLocaleString(); } } } }
     }
   });
-}
-
-// -----------------------------------------
-// LINE CHART
-// -----------------------------------------
-function updateLineChart(data, invest) {
-  const labels = data.map(d => months[d.monthIdx]);
-  let cumulative = 0;
-  const netVals = data.map(d => {
-    let inc = sumObj(d.income);
-    if (!invest) inc -= (d.income['3004 Rental Property Income'] || 0);
-    let exp = sumObj(d.personalExp);
-    if (invest) exp += sumObj(d.investExp);
-    cumulative += (inc - exp);
-    return parseFloat(cumulative.toFixed(2));
-  });
-
-  if (lineChart) lineChart.destroy();
-  const ctx = document.getElementById('lineChart').getContext('2d');
-  lineChart = new Chart(ctx, {
+  lineChart = new Chart(document.getElementById('lineChart'), {
     type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Cumulative Net',
-        data: netVals,
-        borderColor: '#6366f1',
-        backgroundColor: 'rgba(99,102,241,0.08)',
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: '#6366f1',
-        pointRadius: 5,
-      }]
-    },
+    data: { labels: [], datasets: [] },
     options: {
-      responsive: true, maintainAspectRatio: false,
+      responsive: true,
       plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false } },
-        y: {
-          ticks: { callback: v => (v >= 0 ? '$' : '-$') + Math.abs(v/1000).toFixed(0) + 'k', font: { size: 10 } },
-          grid: { color: '#f1f5f9' }
-        }
-      }
+      scales: { y: { ticks: { callback: function(v) { return '$' + v.toLocaleString(); } } } }
     }
   });
-}
-
-// -----------------------------------------
-// EXPENSE PIE (personal + optional invest)
-// -----------------------------------------
-function updateExpPie(data, invest) {
-  const totals = {};
-  data.forEach(d => {
-    Object.entries(d.personalExp).forEach(([k, v]) => {
-      const amt = typeof v === 'object' ? sumObj(v) : v;
-      if (amt > 0) totals[k] = (totals[k] || 0) + amt;
-    });
-    if (invest) {
-      Object.entries(d.investExp).forEach(([k, v]) => {
-        const amt = typeof v === 'object' ? sumObj(v) : v;
-        if (amt > 0) totals[k] = (totals[k] || 0) + amt;
-      });
-    }
-  });
-  const titleEl = document.getElementById('expPieTitle');
-  if (titleEl) titleEl.textContent = invest ? 'Expense Breakdown (All)' : 'Expense Breakdown (Personal)';
-  const container = document.getElementById('expPieContainer');
-  const entries = Object.entries(totals).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]);
-  if (container) container.style.height = Math.max(280, entries.length * 24) + 'px';
-  const labels = entries.map(([k]) => k);
-  const values = entries.map(([,v]) => v);
-  const total = values.reduce((a,b) => a+b, 0);
-  const colors = ['#6366f1','#3b82f6','#22c55e','#f59e0b','#ef4444','#a855f7','#06b6d4','#ec4899','#14b8a6','#f97316'];
-
-  if (expPieChart) expPieChart.destroy();
-  const ctx = document.getElementById('expensePieChart').getContext('2d');
-  expPieChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels,
-      datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderWidth: 2, borderColor: '#fff' }]
-    },
+  expPie = new Chart(document.getElementById('expPie'), {
+    type: 'pie',
+    data: { labels: [], datasets: [] },
     options: {
-      responsive: true, maintainAspectRatio: false,
+      responsive: true,
       plugins: {
         legend: {
           position: 'right',
-          maxWidth: 380,
+          maxWidth: 280,
           labels: {
-            font: { size: 11 },
             boxWidth: 14,
-            padding: 10,
-            generateLabels: (chart) => {
-              const d = chart.data;
-              return d.labels.map((label, i) => {
-                const val = d.datasets[0].data[i];
-                const pct = ((val / total) * 100).toFixed(1);
-                return { text: `${label} (${pct}%)`, fillStyle: d.datasets[0].backgroundColor[i], index: i };
+            generateLabels: function(chart) {
+              var ds = chart.data.datasets[0];
+              if (!ds) return [];
+              var total = ds.data.reduce(function(a,b){return a+b;}, 0);
+              return chart.data.labels.map(function(l, i) {
+                return {
+                  text: l + ': ' + (ds.data[i]/total*100).toFixed(1) + '%',
+                  fillStyle: ds.backgroundColor[i],
+                  hidden: !chart.getDataVisibility(i),
+                  index: i
+                };
               });
             }
           }
         },
         tooltip: {
           callbacks: {
-            label: (ctx) => {
-              const pct = ((ctx.parsed / total) * 100).toFixed(1);
-              return ` ${fmt(ctx.parsed)} (${pct}%)`;
+            label: function(ctx) {
+              var total = ctx.dataset.data.reduce(function(a,b){return a+b;}, 0);
+              var pct = (ctx.parsed / total * 100).toFixed(1);
+              return ctx.label + ': $' + ctx.parsed.toLocaleString('en-US',{minimumFractionDigits:2}) + ' (' + pct + '%)';
             }
           }
         }
       }
     }
   });
-}
-
-// -----------------------------------------
-// INCOME PIE
-// -----------------------------------------
-function updateIncPie(data, invest) {
-  const totals = {};
-  data.forEach(d => {
-    Object.entries(d.income).forEach(([k, v]) => {
-      if (!invest && k === '3004 Rental Property Income') return;
-      if (v > 0) totals[k] = (totals[k] || 0) + v;
-    });
-  });
-  const entries = Object.entries(totals).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]);
-  const labels = entries.map(([k]) => k);
-  const values = entries.map(([,v]) => v);
-  const total = values.reduce((a,b) => a+b, 0);
-  const colors = ['#22c55e','#6366f1','#3b82f6','#f59e0b','#a855f7','#06b6d4'];
-
-  if (incPieChart) incPieChart.destroy();
-  const ctx = document.getElementById('incomePieChart').getContext('2d');
-  incPieChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels,
-      datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderWidth: 2, borderColor: '#fff' }]
-    },
+  incPie = new Chart(document.getElementById('incPie'), {
+    type: 'pie',
+    data: { labels: [], datasets: [] },
     options: {
-      responsive: true, maintainAspectRatio: false,
+      responsive: true,
       plugins: {
         legend: {
           position: 'right',
-          maxWidth: 380,
+          maxWidth: 280,
           labels: {
-            font: { size: 11 },
-            generateLabels: (chart) => {
-              const d = chart.data;
-              return d.labels.map((label, i) => {
-                const val = d.datasets[0].data[i];
-                const pct = ((val / total) * 100).toFixed(1);
-                return { text: `${label} (${pct}%)`, fillStyle: d.datasets[0].backgroundColor[i], index: i };
+            boxWidth: 14,
+            generateLabels: function(chart) {
+              var ds = chart.data.datasets[0];
+              if (!ds) return [];
+              var total = ds.data.reduce(function(a,b){return a+b;}, 0);
+              return chart.data.labels.map(function(l, i) {
+                return {
+                  text: l + ': ' + (ds.data[i]/total*100).toFixed(1) + '%',
+                  fillStyle: ds.backgroundColor[i],
+                  hidden: !chart.getDataVisibility(i),
+                  index: i
+                };
               });
             }
           }
         },
         tooltip: {
           callbacks: {
-            label: (ctx) => {
-              const pct = ((ctx.parsed / total) * 100).toFixed(1);
-              return ` ${fmt(ctx.parsed)} (${pct}%)`;
+            label: function(ctx) {
+              var total = ctx.dataset.data.reduce(function(a,b){return a+b;}, 0);
+              var pct = (ctx.parsed / total * 100).toFixed(1);
+              return ctx.label + ': $' + ctx.parsed.toLocaleString('en-US',{minimumFractionDigits:2}) + ' (' + pct + '%)';
             }
           }
         }
@@ -599,173 +417,195 @@ function updateIncPie(data, invest) {
   });
 }
 
-// -----------------------------------------
-// P&L TABLE
-// -----------------------------------------
-function buildPLTable(data, invest) {
-  const head = document.getElementById('plHead');
-  const body = document.getElementById('plBody');
-  const mLabels = data.map(d => months[d.monthIdx]);
-  const n = data.length;
-  const showTotal = n > 1;
+// ─── RENDER ──────────────────────────────────────────────────────────────
+function render() {
+  var s = startIdx, e = endIdx;
+  var visMonths = months.slice(s, e + 1);
 
-  // Header
-  head.innerHTML = `<tr>
-    <th style="min-width:220px">Account</th>
-    ${mLabels.map(m => `<th>${m}</th>`).join('')}
-    ${showTotal ? '<th style="border-left:2px solid #e2e8f0">Total</th>' : ''}
-  </tr>`;
-
-  const rows = [];
-  const startIdx = parseInt(document.getElementById('startMonth').value);
-  const endIdx = parseInt(document.getElementById('endMonth').value);
-  const s = Math.min(startIdx, endIdx);
-  const qboStart = periods[s].start;
-  const qboEnd = periods[Math.max(startIdx, endIdx)].end;
-  function addRow(cls, label, vals, extra = '') {
-    const totalVal = vals.reduce((a,b) => a+b, 0);
-    const cells = vals.map(v => `<td class="${v < 0 ? 'negative' : ''}">${v !== 0 ? fmt(v) : '-'}</td>`).join('');
-    const totalCell = showTotal ? `<td class="${totalVal < 0 ? 'negative' : ''}" style="border-left:2px solid #e2e8f0;font-weight:600">${fmt(totalVal)}</td>` : '';
-    rows.push(`<tr class="${cls}"${extra}><td>${label}</td>${cells}${totalCell}</tr>`);
-  }
-
-  function sectionRows(sectionLabel, sectionKey, cls5000 = false) {
-    // Collect all sub-keys across months
-    const allKeys = new Set();
-    data.forEach(d => {
-      const src = cls5000 ? d.investExp : d.personalExp;
-      Object.keys(src).forEach(k => allKeys.add(k));
-    });
-
-    const sectionTotals = Array(n).fill(0);
-
-    allKeys.forEach(key => {
-      // Check if it's a group
-      const isGroup = data.some(d => {
-        const src = cls5000 ? d.investExp : d.personalExp;
-        return src[key] && typeof src[key] === 'object';
-      });
-
-      const keyVals = data.map(d => {
-        const src = cls5000 ? d.investExp : d.personalExp;
-        if (!src[key]) return 0;
-        return typeof src[key] === 'object' ? sumObj(src[key]) : src[key];
-      });
-      keyVals.forEach((v, i) => sectionTotals[i] += v);
-
-      if (isGroup) {
-        addRow('sub-row section-header', `<span class="expand-icon">&#x25BC;</span>${key}`, keyVals, ` data-group="${sectionKey}-${key}"`);
-        // Sub-rows
-        const allSubKeys = new Set();
-        data.forEach(d => {
-          const src = cls5000 ? d.investExp : d.personalExp;
-          if (src[key] && typeof src[key] === 'object') Object.keys(src[key]).forEach(sk => allSubKeys.add(sk));
-        });
-        allSubKeys.forEach(sk => {
-          const skVals = data.map(d => {
-            const src = cls5000 ? d.investExp : d.personalExp;
-            if (!src[key] || typeof src[key] !== 'object') return 0;
-            return src[key][sk] || 0;
-          });
-          if (skVals.some(v => v !== 0)) {
-            addRow(`sub-sub-row collapsible ${sectionKey}-${key}`, sk, skVals);
-          }
-        });
-      } else {
-        if (keyVals.some(v => v !== 0)) addRow('sub-row', key, keyVals);
-      }
-    });
-
-    // Section total
-    const totalCells = sectionTotals.map(v => `<td class="${v<0?'negative':''}" style="font-weight:700">${fmt(v)}</td>`).join('');
-    const grandTotal = sectionTotals.reduce((a,b)=>a+b,0);
-    const totalExtra = showTotal ? `<td style="border-left:2px solid #e2e8f0;font-weight:800">${fmt(grandTotal)}</td>` : '';
-    rows.push(`<tr class="total-row"><td style="padding-left:12px">Total ${sectionLabel}</td>${totalCells}${totalExtra}</tr>`);
-    return sectionTotals;
-  }
-
-  // -- INCOME --
-  const incTotals = Array(n).fill(0);
-  const allIncKeys = new Set();
-  data.forEach(d => Object.keys(d.income).forEach(k => allIncKeys.add(k)));
-
-  // Section header
-  rows.push(`<tr class="section-header" data-group="income-section" onclick="toggleSection('income-section', this)"><td colspan="${n + (showTotal?2:1)}" style="padding:10px 12px"><span class="expand-icon">&#x25BC;</span><strong> INCOME</strong></td></tr>`);
-
-  allIncKeys.forEach(k => {
-    if (!invest && k === '3004 Rental Property Income') return;
-    const vals = data.map(d => d.income[k] || 0);
-    vals.forEach((v,i) => incTotals[i] += v);
-    if (vals.some(v => v !== 0)) addRow(`sub-row collapsible income-section`, k, vals);
+  // Compute filtered income
+  var incomeRows = showInvest ? incomeAccounts : incomeAccounts.filter(function(a){return a.code !== '3004';});
+  var totalIncomePerMonth = visMonths.map(function(_, mi) {
+    var idx = s + mi;
+    return incomeRows.reduce(function(acc, a){return acc + a.values[idx];}, 0);
   });
-  const incTotalCells = incTotals.map(v => `<td style="font-weight:700">${fmt(v)}</td>`).join('');
-  const incGrand = incTotals.reduce((a,b)=>a+b,0);
-  rows.push(`<tr class="total-row"><td style="padding-left:12px">Total Income</td>${incTotalCells}${showTotal?`<td style="border-left:2px solid #e2e8f0;font-weight:800">${fmt(incGrand)}</td>`:''}</tr>`);
+  var totalIncome = totalIncomePerMonth.reduce(function(a,b){return a+b;}, 0);
 
-  // Spacer
-  rows.push(`<tr><td colspan="${n + (showTotal?2:1)}" style="height:8px;background:#f8fafc"></td></tr>`);
+  // Compute filtered expenses
+  var personalPerMonth = visMonths.map(function(_, mi) {
+    var idx = s + mi;
+    return personalExpenses.reduce(function(acc, a){return acc + a.values[idx];}, 0);
+  });
+  var investPerMonth = visMonths.map(function(_, mi) {
+    var idx = s + mi;
+    return investExpenses.reduce(function(acc, a){return acc + a.values[idx];}, 0);
+  });
+  var totalExpPerMonth = visMonths.map(function(_, mi) {
+    return personalPerMonth[mi] + (showInvest ? investPerMonth[mi] : 0);
+  });
+  var totalExpenses = totalExpPerMonth.reduce(function(a,b){return a+b;}, 0);
+  var netIncome = totalIncome - totalExpenses;
 
-  // -- PERSONAL EXPENSES --
-  rows.push(`<tr class="section-header" data-group="personal-section" onclick="toggleSection('personal-section', this)"><td colspan="${n + (showTotal?2:1)}" style="padding:10px 12px"><span class="expand-icon">&#x25BC;</span><strong> PERSONAL EXPENSES (4000s)</strong></td></tr>`);
-  const pTotals = sectionRows('Personal Expenses', 'personal');
+  // KPI cards
+  document.getElementById('kpiIncome').textContent = fmtDollar(totalIncome);
+  document.getElementById('kpiIncome').className = 'kpi-value positive';
 
-  rows.push(`<tr><td colspan="${n + (showTotal?2:1)}" style="height:8px;background:#f8fafc"></td></tr>`);
+  document.getElementById('kpiExpenses').textContent = fmtDollar(totalExpenses);
+  document.getElementById('kpiExpenses').className = 'kpi-value negative';
 
-  // -- INVESTMENT PROPERTY EXPENSES --
-  if (invest) {
-    rows.push(`<tr class="section-header" data-group="invest-section" onclick="toggleSection('invest-section', this)"><td colspan="${n + (showTotal?2:1)}" style="padding:10px 12px"><span class="expand-icon">&#x25BC;</span><strong> INVESTMENT PROPERTY EXPENSES (5000s)</strong></td></tr>`);
-    const iTotals = sectionRows('Investment Property Expenses', 'invest', true);
-    rows.push(`<tr><td colspan="${n + (showTotal?2:1)}" style="height:8px;background:#f8fafc"></td></tr>`);
+  var netEl = document.getElementById('kpiNet');
+  netEl.textContent = fmtDollar(netIncome);
+  netEl.className = 'kpi-value ' + (netIncome >= 0 ? 'positive' : 'negative');
 
-    // Grand totals
-    const totalExpArr = pTotals.map((v,i) => v + iTotals[i]);
-    const netArr = incTotals.map((v,i) => v - totalExpArr[i]);
-    const totalExpCells = totalExpArr.map(v => `<td class="${v<0?'negative':''}" style="font-weight:700">${fmt(v)}</td>`).join('');
-    const netCells = netArr.map(v => `<td class="${v<0?'negative':'positive'}" style="font-weight:800">${fmt(v)}</td>`).join('');
-    const totalExpGrand = totalExpArr.reduce((a,b)=>a+b,0);
-    const netGrand = netArr.reduce((a,b)=>a+b,0);
-    rows.push(`<tr class="total-row"><td style="padding-left:12px;font-weight:700">Total Expenses</td>${totalExpCells}${showTotal?`<td style="border-left:2px solid #e2e8f0;font-weight:800">${fmt(totalExpGrand)}</td>`:''}</tr>`);
-    rows.push(`<tr class="grand-total"><td>NET INCOME</td>${netCells}${showTotal?`<td style="border-left:2px solid #e2e8f0">${fmt(netGrand)}</td>`:''}</tr>`);
-  } else {
-    const netArr = incTotals.map((v,i) => v - pTotals[i]);
-    const netCells = netArr.map(v => `<td class="${v<0?'negative':'positive'}" style="font-weight:800">${fmt(v)}</td>`).join('');
-    const netGrand = netArr.reduce((a,b)=>a+b,0);
-    const pTotalCells = pTotals.map(v => `<td style="font-weight:700">${fmt(v)}</td>`).join('');
-    const pGrand = pTotals.reduce((a,b)=>a+b,0);
-    rows.push(`<tr class="total-row"><td style="padding-left:12px;font-weight:700">Total Expenses</td>${pTotalCells}${showTotal?`<td style="border-left:2px solid #e2e8f0;font-weight:800">${fmt(pGrand)}</td>`:''}</tr>`);
-    rows.push(`<tr class="grand-total"><td>NET INCOME</td>${netCells}${showTotal?`<td style="border-left:2px solid #e2e8f0">${fmt(netGrand)}</td>`:''}</tr>`);
+  document.getElementById('kpiCash').textContent = fmtDollar(cashFlow.cashEnd);
+  document.getElementById('kpiCash').className = 'kpi-value positive';
+
+  // Bar chart
+  barChart.data.labels = visMonths;
+  barChart.data.datasets = [
+    { label: 'Income', data: totalIncomePerMonth, backgroundColor: '#2ecc71' },
+    { label: 'Expenses', data: totalExpPerMonth, backgroundColor: '#e74c3c' }
+  ];
+  barChart.update();
+
+  // Line chart - cumulative net income
+  var cum = 0;
+  var cumData = visMonths.map(function(_, mi) {
+    cum += totalIncomePerMonth[mi] - totalExpPerMonth[mi];
+    return cum;
+  });
+  lineChart.data.labels = visMonths;
+  lineChart.data.datasets = [{
+    label: 'Cumulative Net Income',
+    data: cumData,
+    borderColor: '#2980b9',
+    backgroundColor: 'rgba(41,128,185,0.1)',
+    fill: true,
+    tension: 0.3,
+    pointRadius: 5
+  }];
+  lineChart.update();
+
+  // Expense pie (4000s only, show categories with positive totals)
+  var expLabels = [], expData = [], expColors = [];
+  personalExpenses.forEach(function(a, i) {
+    var v = sumRange(a.values, s, e);
+    if (v > 0) {
+      expLabels.push(a.name);
+      expData.push(Math.round(v * 100) / 100);
+      expColors.push(pieColors[i % pieColors.length]);
+    }
+  });
+  expPie.data.labels = expLabels;
+  expPie.data.datasets = [{ data: expData, backgroundColor: expColors }];
+  expPie.update();
+
+  // Income pie (positive sources only)
+  var incLabels = [], incData = [], incColors = [];
+  incomeRows.forEach(function(a, i) {
+    var v = sumRange(a.values, s, e);
+    if (v > 0) {
+      incLabels.push(a.name);
+      incData.push(Math.round(v * 100) / 100);
+      incColors.push(pieColors[i % pieColors.length]);
+    }
+  });
+  incPie.data.labels = incLabels;
+  incPie.data.datasets = [{ data: incData, backgroundColor: incColors }];
+  incPie.update();
+
+  // ─── P&L Table ─────────────────────────────────────────────────────────
+  var table = document.getElementById('plTable');
+  var colSpan = visMonths.length + 2;
+  var link = qboLink(s, e);
+  var html = '<thead><tr><th>Account</th>';
+  visMonths.forEach(function(m) { html += '<th>' + m + '</th>'; });
+  html += '<th>Total</th></tr></thead><tbody>';
+
+  // Income section
+  var incSym = collapsed.income ? '\u25B6' : '\u25BC';
+  html += '<tr class="section-header" data-section="income"><td colspan="' + colSpan + '">' + incSym + ' Income</td></tr>';
+  if (!collapsed.income) {
+    incomeRows.forEach(function(a) {
+      var vals = visMonths.map(function(_, mi){return a.values[s + mi];});
+      var total = vals.reduce(function(x,y){return x+y;}, 0);
+      html += '<tr class="child-row clickable" ondblclick="window.open(\'' + link + '\')">';
+      html += '<td>' + a.code + ' ' + a.name + '</td>';
+      vals.forEach(function(v) { html += '<td>' + fmt(v) + '</td>'; });
+      html += '<td>' + fmt(total) + '</td></tr>';
+    });
+    html += '<tr class="total-row"><td>Total Income</td>';
+    totalIncomePerMonth.forEach(function(v) { html += '<td>' + fmt(v) + '</td>'; });
+    html += '<td>' + fmt(totalIncome) + '</td></tr>';
   }
 
-  body.innerHTML = rows.join('');
+  // Personal Expenses section
+  var persSym = collapsed.personal ? '\u25B6' : '\u25BC';
+  html += '<tr class="section-header" data-section="personal"><td colspan="' + colSpan + '">' + persSym + ' Personal Expenses (4000s)</td></tr>';
+  if (!collapsed.personal) {
+    personalExpenses.forEach(function(a) {
+      var vals = visMonths.map(function(_, mi){return a.values[s + mi];});
+      var total = vals.reduce(function(x,y){return x+y;}, 0);
+      html += '<tr class="child-row clickable" ondblclick="window.open(\'' + link + '\')">';
+      html += '<td>' + a.code + ' ' + a.name + '</td>';
+      vals.forEach(function(v) { html += '<td>' + fmt(v) + '</td>'; });
+      html += '<td>' + fmt(total) + '</td></tr>';
+    });
+    var totalPers = personalPerMonth.reduce(function(a,b){return a+b;}, 0);
+    html += '<tr class="total-row"><td>Total Personal Expenses</td>';
+    personalPerMonth.forEach(function(v) { html += '<td>' + fmt(v) + '</td>'; });
+    html += '<td>' + fmt(totalPers) + '</td></tr>';
+  }
 
-  // Section toggle click handlers
-  document.querySelectorAll('.section-header[data-group]').forEach(row => {
+  // Investment Property Expenses section
+  if (showInvest) {
+    var invSym = collapsed.invest ? '\u25B6' : '\u25BC';
+    html += '<tr class="section-header" data-section="invest"><td colspan="' + colSpan + '">' + invSym + ' Investment Property Expenses (5000s)</td></tr>';
+    if (!collapsed.invest) {
+      investExpenses.forEach(function(a) {
+        var vals = visMonths.map(function(_, mi){return a.values[s + mi];});
+        var total = vals.reduce(function(x,y){return x+y;}, 0);
+        html += '<tr class="child-row clickable" ondblclick="window.open(\'' + link + '\')">';
+        html += '<td>' + a.code + ' ' + a.name + '</td>';
+        vals.forEach(function(v) { html += '<td>' + fmt(v) + '</td>'; });
+        html += '<td>' + fmt(total) + '</td></tr>';
+      });
+      var totalInv = investPerMonth.reduce(function(a,b){return a+b;}, 0);
+      html += '<tr class="total-row"><td>Total Investment Property Expenses</td>';
+      investPerMonth.forEach(function(v) { html += '<td>' + fmt(v) + '</td>'; });
+      html += '<td>' + fmt(totalInv) + '</td></tr>';
+    }
+  }
+
+  // Net Income row
+  var netPerMonth = visMonths.map(function(_, mi) { return totalIncomePerMonth[mi] - totalExpPerMonth[mi]; });
+  html += '<tr class="net-row"><td>Net Income</td>';
+  netPerMonth.forEach(function(v) { html += '<td>' + fmt(v) + '</td>'; });
+  html += '<td>' + fmt(netIncome) + '</td></tr>';
+
+  html += '</tbody>';
+  table.innerHTML = html;
+
+  // Attach collapse handlers
+  table.querySelectorAll('.section-header').forEach(function(row) {
     row.addEventListener('click', function() {
-      const group = this.getAttribute('data-group');
-      toggleSection(group, this);
+      var sec = row.dataset.section;
+      collapsed[sec] = !collapsed[sec];
+      render();
     });
   });
 
-  // Sub-group toggles
-  document.querySelectorAll('[data-group]').forEach(row => {
-    if (!row.classList.contains('section-header') || row.tagName !== 'TR') return;
-    row.addEventListener('click', function(e) {
-      const group = this.getAttribute('data-group');
-      const icon = this.querySelector('.expand-icon');
-      const isCollapsed = this.classList.toggle('collapsed');
-      document.querySelectorAll(`.${group}`).forEach(r => r.classList.toggle('hidden', isCollapsed));
-    });
-  });
+  // Cash flow section
+  document.getElementById('cfOp').textContent = fmtDollar(cashFlow.operating);
+  document.getElementById('cfInv').textContent = fmtDollar(cashFlow.investing);
+  document.getElementById('cfFin').textContent = fmtDollar(cashFlow.financing);
+  document.getElementById('cfNet').textContent = fmtDollar(cashFlow.netIncrease);
+  document.getElementById('cfBeg').textContent = fmtDollar(cashFlow.cashBeginning);
+  document.getElementById('cfEnd').textContent = fmtDollar(cashFlow.cashEnd);
 }
 
-function toggleSection(group, headerRow) {
-  const icon = headerRow.querySelector('.expand-icon');
-  const isCollapsed = headerRow.classList.toggle('collapsed');
-  document.querySelectorAll(`.${group}`).forEach(r => r.classList.toggle('hidden', isCollapsed));
-}
-
-// Init
-updateDashboard();
+// ─── INIT ────────────────────────────────────────────────────────────────
+initCharts();
+render();
 </script>
 </body>
 </html>
