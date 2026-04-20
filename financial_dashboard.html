@@ -110,7 +110,7 @@ const MONTH_NAMES = ['January','February','March','April','May','June','July','A
 
 // Income accounts
 const INCOME_ACCOUNTS = [
-  { code:'3001', name:'W2 Income',             vals:[7948.39, 7948.40, 7948.40, 3980.78], isRental:false },
+  { code:'3001', name:'W2 Income',             vals:[7948.39, 7948.40, 7948.40, 7940.22], isRental:false },
   { code:'3002', name:'Side Work Income',       vals:[2157.06, 1741.59, 2872.60, 0],       isRental:false },
   { code:'3003', name:'Interest income',        vals:[642.99,  524.21,  506.53,  0],       isRental:false },
   { code:'3004', name:'Rental Property Income', vals:[6722.32, 7854.22, 5164.56, 0],       isRental:true  },
@@ -120,35 +120,35 @@ const INCOME_ACCOUNTS = [
 
 // Personal expense accounts 4000
 const EXPENSE_4000 = [
-  { code:'4001.01', name:'Food - Eating Out',         vals:[123.93,  137.98,  173.75,   72.12]  },
-  { code:'4001.02', name:'Food - Groceries',          vals:[721.63,  667.02,  715.12,  106.48]  },
-  { code:'4002',    name:'Medical',                   vals:[297.75,  647.06,  292.41,    0]      },
-  { code:'4003.01', name:'Gas & Fuel',                vals:[227.97,  208.07,  358.37,  162.00]  },
-  { code:'4003.02', name:'Vehicle Maintenance',       vals:[0,       150.54, 1412.58,   41.79]  },
-  { code:'4003.03', name:'Vehicle Insurance',         vals:[174.00,  395.04,    0,        0]    },
-  { code:'4005',    name:'Entertainment',             vals:[45.97,   191.80,   21.99,   21.99]  },
-  { code:'4007',    name:'Clothes, Home Stuff, Misc', vals:[142.38,  288.48, -188.17,  253.89]  },
-  { code:'4008',    name:'Travel',                    vals:[0,      1066.24, -326.17,    0]      },
-  { code:'4009',    name:'Gifts',                     vals:[20.00,   143.45,   43.99,    0]      },
-  { code:'4011',    name:'Childcare',                 vals:[337.50,    0,       61.25,    0]      },
+  { code:'4001.01', name:'Food - Eating Out',         vals:[123.93,  137.98,  173.75,  105.81] },
+  { code:'4001.02', name:'Food - Groceries',          vals:[721.63,  667.02,  715.12,  106.48] },
+  { code:'4002',    name:'Medical',                   vals:[297.75,  647.06,  292.41,  102.60] },
+  { code:'4003.01', name:'Gas & Fuel',                vals:[227.97,  208.07,  358.37,  233.97] },
+  { code:'4003.02', name:'Vehicle Maintenance',       vals:[0,       150.54,  1412.58, 66.79]  },
+  { code:'4003.03', name:'Vehicle Insurance',         vals:[174.00,  395.04,  0,       0]      },
+  { code:'4005',    name:'Entertainment',             vals:[45.97,   191.80,  21.99,   21.99]  },
+  { code:'4007',    name:'Clothes, Home Stuff, Misc', vals:[142.38,  288.48, -188.17,  242.76] },
+  { code:'4008',    name:'Travel',                    vals:[0,       1066.24, -326.17,  0]     },
+  { code:'4009',    name:'Gifts',                     vals:[20.00,   143.45,  43.99,   52.40]  },
+  { code:'4011',    name:'Childcare',                 vals:[337.50,  0,       61.25,   0]      },
 ];
 
 // Other Expenses
 const OTHER_EXPENSES = [
-  { code:'4999',    name:'OEM Pass Through',  vals:[0,     0,    -165.00,  0]    },
-  { code:'—',       name:'Parking & tolls',   vals:[1.35,  0,    7.05,     1.85] },
+  { code:'4999', name:'OEM Pass Through', vals:[0,     0,    -165.00, -700.00] },
+  { code:'—',    name:'Parking & tolls',  vals:[1.35,  0,    7.05,    1.85]   },
 ];
 
 // Investment property expense accounts 5000
 const EXPENSE_5000 = [
-  { code:'5001.01', name:'Mortgage Principal Pay down', vals:[8278.80,  4336.70,  1108.53,  1842.85] },
-  { code:'5001.02', name:'Mortgage Interest',           vals:[ 337.50,   187.50,   337.50,  2701.74] },
-  { code:'5001',    name:'Mortgages (Other)',            vals:[0,         0,         0,       150.00] },
-  { code:'5002',    name:'Property Insurance',          vals:[ 98.83,    98.83,    98.83,    98.83]  },
-  { code:'5003',    name:'Property Taxes',              vals:[0,       4123.26,     0,         0]    },
-  { code:'5004',    name:'Maintenance',                 vals:[13173.33, 17528.72,   14.80,  3218.99] },
-  { code:'5005',    name:'Utilities',                   vals:[ 346.85,  2666.77,  2456.61,  284.68] },
-  { code:'5000',    name:'Rental Properties (Other)',   vals:[0,         0,        77.41,     0]     },
+  { code:'5001.01', name:'Mortgage Principal Pay down', vals:[8278.80, 4336.70, 1108.53, 1842.85] },
+  { code:'5001.02', name:'Mortgage Interest',           vals:[337.50,  187.50,  337.50,  2701.74] },
+  { code:'5001',    name:'Mortgages (Other)',           vals:[0,       0,       0,       150.00]  },
+  { code:'5002',    name:'Property Insurance',          vals:[98.83,   98.83,   98.83,   98.83]   },
+  { code:'5003',    name:'Property Taxes',              vals:[0,       4123.26, 0,       0]       },
+  { code:'5004',    name:'Maintenance',                 vals:[13173.33,17528.72,14.80,   3218.99] },
+  { code:'5005',    name:'Utilities',                   vals:[346.85,  2666.77, 2456.61, 284.68]  },
+  { code:'5000',    name:'Rental Properties (Other)',   vals:[0,       0,       77.41,   0]       },
 ];
 
 // Cash flow per-month arrays from QBO Cash Flow Statement
@@ -156,8 +156,8 @@ const CF_FINANCING      = [238109.65, 53212.02, 0, 0];
 const CF_INVESTING      = [0, 0, 0, 0];
 const CF_BEGINNING_CASH = 108.00;
 
-// Actual "Total for 1000 Cash" from QBO Balance Sheet at each month-end
-const CASH_BALANCES = [233531.06, 274365.96, 286136.88, 279831.55];
+// Actual "Total for 1000 Cash" from QBO at each month-end (CASH AT END OF PERIOD)
+const CASH_BALANCES = [233531.06, 274365.96, 286136.88, 284399.52];
 
 // ── FORMATTERS ────────────────────────────────────────────────────────────────
 const usd = v => v.toLocaleString('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2});
