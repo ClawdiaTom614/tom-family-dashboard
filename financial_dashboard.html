@@ -96,7 +96,7 @@ footer{text-align:center;padding:16px;font-size:.75rem;color:#aaa}
 </div>
 
 </div>
-<footer>Tom Family Financial Dashboard &bull; QuickBooks Online &ldquo;Personal Life&rdquo; &bull; Generated May 2, 2026</footer>
+<footer>Tom Family Financial Dashboard &bull; QuickBooks Online &ldquo;Personal Life&rdquo; &bull; Generated May 3, 2026</footer>
 
 <script>
 // ── DATA ──────────────────────────────────────────────────────────────────────
@@ -105,13 +105,13 @@ const MONTHS = [
   { label:'Feb 2026', start:'2026-02-01', end:'2026-02-28' },
   { label:'Mar 2026', start:'2026-03-01', end:'2026-03-31' },
   { label:'Apr 2026', start:'2026-04-01', end:'2026-04-30' },
-  { label:'May 2026', start:'2026-05-01', end:'2026-05-02' },
+  { label:'May 2026', start:'2026-05-01', end:'2026-05-03' },
 ];
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 // Income accounts
 const INCOME_ACCOUNTS = [
-  { code:'3001', name:'W2 Income',             vals:[7948.39, 7948.40, 7948.40, 8190.22, 0],    isRental:false },
+  { code:'3001', name:'W2 Income',             vals:[7948.39, 7948.40, 7948.40, 10454.53, 0],   isRental:false },
   { code:'3002', name:'Side Work Income',       vals:[2157.06, 1741.59, 2872.60, 179.14,  0],    isRental:false },
   { code:'3003', name:'Interest income',        vals:[642.99,  524.21,  506.53,  455.82,  0],    isRental:false },
   { code:'3004', name:'Rental Property Income', vals:[6722.32, 7854.22, 5164.56, 4518.98, 0],    isRental:true  },
@@ -144,7 +144,7 @@ const OTHER_EXPENSES = [
 const EXPENSE_5000 = [
   { code:'5001.01', name:'Mortgage Principal Pay down', vals:[8278.80,  4336.70,  1108.53,  11842.85, 0] },
   { code:'5001.02', name:'Mortgage Interest',           vals:[337.50,   187.50,   337.50,   2701.74,  0] },
-  { code:'5001',    name:'Mortgages (Other)',           vals:[0,        0,        0,        150.00,   0] },
+  { code:'5001',    name:'Mortgages (Other)',           vals:[0,        0,        0,        150.00,   150.00] },
   { code:'5002',    name:'Property Insurance',          vals:[98.83,    98.83,    98.83,    98.83,    0] },
   { code:'5003',    name:'Property Taxes',              vals:[0,        4123.26,  0,        0,        0] },
   { code:'5004',    name:'Maintenance',                 vals:[13173.33, 17528.72, 14.80,    3421.43,  0] },
@@ -158,7 +158,7 @@ const CF_INVESTING      = [0, 0, 0, 0, 0];
 const CF_BEGINNING_CASH = 108.00;
 
 // Actual "Total for 1000 Cash" from QBO Balance Sheet at each month-end
-const CASH_BALANCES = [233531.06, 274365.96, 286136.88, 277273.46, 277273.46];
+const CASH_BALANCES = [233531.06, 274365.96, 286136.88, 279537.77, 279387.77];
 
 // ── FORMATTERS ────────────────────────────────────────────────────────────────
 const usd = v => v.toLocaleString('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2});
