@@ -2,485 +2,497 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tom Family Financial Dashboard — 2026</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;color:#333}
-header{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);color:#fff;padding:24px 32px;font-size:1.4rem;font-weight:600;letter-spacing:.02em}
-.main{max-width:1400px;margin:0 auto;padding:24px}
-.controls{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:16px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-bottom:24px}
-.controls label{font-size:.85rem;color:#666;margin-right:6px}
-.controls select{padding:6px 10px;border:1px solid #ddd;border-radius:6px;font-size:.9rem;background:#fff;cursor:pointer}
-.toggle-btn{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-size:.9rem}
-.qb-link{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:7px 16px;background:#2ca01c;color:#fff;text-decoration:none;border-radius:6px;font-size:.85rem;font-weight:600;transition:background .15s}
-.qb-link:hover{background:#248a17}
-.toggle-btn input[type=checkbox]{width:18px;height:18px;cursor:pointer;accent-color:#2563eb}
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
-.kpi-card{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:20px 24px;border-left:4px solid #ccc}
-.kpi-card.income{border-left-color:#16a34a}
-.kpi-card.expense{border-left-color:#dc2626}
-.kpi-card.net{border-left-color:#2563eb}
-.kpi-card.cash{border-left-color:#7c3aed}
-.kpi-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:8px}
-.kpi-value{font-size:1.4rem;font-weight:700;font-variant-numeric:tabular-nums}
-.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
-@media(max-width:900px){.charts-grid{grid-template-columns:1fr}}
-.chart-card{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:20px 24px}
-.chart-card h3{font-size:.95rem;font-weight:600;color:#444;margin-bottom:16px}
-.chart-card canvas{max-height:280px}
-.pl-section,.cf-section{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:20px 24px;margin-bottom:24px}
-.pl-section h3,.cf-section h3{font-size:.95rem;font-weight:600;color:#444;margin-bottom:4px}
-.pl-section{overflow-x:auto}
-table.pl-table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
-table.pl-table th{text-align:left;padding:8px 12px;border-bottom:2px solid #e5e7eb;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:#666;background:#fff}
-table.pl-table th:not(:first-child),table.pl-table td:not(:first-child){text-align:right}
-table.pl-table td{padding:6px 12px;border-bottom:1px solid #f3f4f6;color:#111}
-tr.section-header td{background:#f9fafb;font-weight:600;cursor:pointer}
-tr.section-header td:first-child::before{content:'▾ ';font-size:.7rem}
-tr.section-header.collapsed td:first-child::before{content:'▸ '}
-tr.row-item td{color:#555}
-tr.row-total td{background:#f0f2f5;font-weight:700;border-top:1px solid #e5e7eb}
-tr.row-grand-total td{background:#1a1a2e;color:#fff;font-weight:700}
-tr.hidden{display:none}
-tr.row-item:hover td{background:#f9fafb}
-table.cf-table{width:100%;max-width:520px;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
-table.cf-table td{padding:6px 12px;border-bottom:1px solid #f3f4f6;color:#111}
-table.cf-table td:last-child{text-align:right}
-tr.cf-header td{font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:#555;padding-top:14px;border-bottom:none}
-tr.cf-indent td:first-child{padding-left:28px}
-tr.cf-subtotal td{font-weight:600;border-top:1px solid #e5e7eb}
-tr.cf-total td{font-weight:700;border-top:2px solid #333;background:#f9fafb}
-tr.cf-grand-total td{font-weight:700;background:#1a1a2e;color:#fff}
-footer{text-align:center;padding:16px;font-size:.75rem;color:#aaa}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: #f4f5f7; color: #1a1a2e; line-height: 1.4;
+  }
+  header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff; padding: 28px 32px;
+  }
+  header h1 { font-size: 24px; font-weight: 700; }
+  header p { opacity: 0.75; font-size: 14px; margin-top: 4px; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 20px 24px 60px; }
+  .controls {
+    background: #fff; border-radius: 12px; padding: 16px 20px; margin-bottom: 22px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-wrap: wrap;
+    gap: 18px 26px; align-items: center;
+  }
+  .controls label { font-size: 13px; font-weight: 600; color: #444; display: block; margin-bottom: 4px; }
+  .controls select {
+    padding: 7px 10px; border: 1px solid #ccd; border-radius: 7px; font-size: 14px;
+    background: #fff; min-width: 120px;
+  }
+  .ctrl-field { display: flex; flex-direction: column; }
+  .toggle-field { display: flex; align-items: center; gap: 8px; padding-top: 18px; }
+  .toggle-field input { width: 18px; height: 18px; }
+  .toggle-field span { font-size: 14px; font-weight: 600; }
+  .qb-btn {
+    margin-left: auto; align-self: flex-end; background: #2ca01c; color: #fff;
+    border: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; text-decoration: none; display: inline-block;
+  }
+  .qb-btn:hover { background: #248017; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 22px; }
+  .kpi {
+    background: #fff; border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border-left: 5px solid #888;
+  }
+  .kpi.green  { border-left-color: #2ca01c; }
+  .kpi.red    { border-left-color: #d64545; }
+  .kpi.blue   { border-left-color: #2f6df0; }
+  .kpi.purple { border-left-color: #7a4ddb; }
+  .kpi .k-label { font-size: 13px; color: #667; font-weight: 600; }
+  .kpi .k-value { font-size: 25px; font-weight: 700; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 22px; }
+  .card {
+    background: #fff; border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .card h2 { font-size: 16px; margin-bottom: 14px; color: #1a1a2e; }
+  .chart-box { position: relative; height: 300px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { padding: 7px 10px; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; white-space: normal; }
+  thead th { background: #1a1a2e; color: #fff; font-weight: 600; position: sticky; top: 0; }
+  .pl-table-wrap { overflow-x: auto; }
+  tr.section td { background: #e9ebf0; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: .5px; color: #333; }
+  tr.group { cursor: pointer; background: #f6f7fb; font-weight: 600; }
+  tr.group:hover { background: #eef0f7; }
+  tr.group .arrow { display: inline-block; width: 14px; color: #2f6df0; font-size: 11px; }
+  tr.leaf td { color: #1a1a2e; }
+  tr.netrow td { border-top: 2px solid #1a1a2e; font-weight: 700; background: #fafbff; }
+  .name-cell { display: flex; align-items: center; }
+  tr.collapsed-hidden { display: none; }
+  .cf-table td { border-bottom: 1px solid #eee; }
+  .cf-table tr.cf-total td { font-weight: 700; border-top: 1px solid #1a1a2e; border-bottom: 2px solid #1a1a2e; }
+  .cf-table tr.cf-final td { font-weight: 700; }
+  @media (max-width: 900px) {
+    .kpis { grid-template-columns: 1fr 1fr; }
+    .grid2 { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
-<header>Tom Family Financial Dashboard — 2026</header>
-<div class="main">
+<header>
+  <h1>Tom Family Financial Dashboard — 2026</h1>
+  <p>QuickBooks "Personal Life" · Data through June 15, 2026</p>
+</header>
+<div class="wrap">
 
-<div class="controls">
-  <div><label for="sel-start">From</label><select id="sel-start"></select></div>
-  <div><label for="sel-end">To</label><select id="sel-end"></select></div>
-  <label class="toggle-btn"><input type="checkbox" id="toggle-rental" checked> Show Investment Properties</label>
-  <a class="qb-link" href="https://app.qbo.intuit.com/app/homepage" target="_blank" rel="noopener">Open QuickBooks</a>
-</div>
+  <div class="controls">
+    <div class="ctrl-field">
+      <label for="startSel">Start month</label>
+      <select id="startSel"></select>
+    </div>
+    <div class="ctrl-field">
+      <label for="endSel">End month</label>
+      <select id="endSel"></select>
+    </div>
+    <div class="toggle-field">
+      <input type="checkbox" id="investToggle" checked>
+      <span>Investment Properties</span>
+    </div>
+    <a class="qb-btn" href="https://app.qbo.intuit.com/app/homepage" target="_blank" rel="noopener">Open QuickBooks</a>
+  </div>
 
-<div class="kpi-grid">
-  <div class="kpi-card income"><div class="kpi-label">Total Income</div><div class="kpi-value" id="kpi-income">—</div></div>
-  <div class="kpi-card expense"><div class="kpi-label">Total Expenses</div><div class="kpi-value" id="kpi-expense">—</div></div>
-  <div class="kpi-card net"><div class="kpi-label">Net Income</div><div class="kpi-value" id="kpi-net">—</div></div>
-  <div class="kpi-card cash"><div class="kpi-label">Cash at End of Period</div><div class="kpi-value" id="kpi-cash">—</div></div>
-</div>
+  <div class="kpis">
+    <div class="kpi green">  <div class="k-label">Total Income</div>        <div class="k-value" id="kpiIncome">$0.00</div></div>
+    <div class="kpi red">    <div class="k-label">Total Expenses</div>      <div class="k-value" id="kpiExpenses">$0.00</div></div>
+    <div class="kpi blue">   <div class="k-label">Net Income</div>          <div class="k-value" id="kpiNet">$0.00</div></div>
+    <div class="kpi purple"> <div class="k-label">Cash at End of Period</div><div class="k-value" id="kpiCash">$0.00</div></div>
+  </div>
 
-<div class="charts-grid">
-  <div class="chart-card"><h3>Monthly Income vs. Expenses</h3><canvas id="chart-bar"></canvas></div>
-  <div class="chart-card"><h3>Cumulative Net Income</h3><canvas id="chart-line"></canvas></div>
-  <div class="chart-card"><h3>Expenses by Category</h3><canvas id="chart-pie-expense"></canvas></div>
-  <div class="chart-card"><h3>Income by Source</h3><canvas id="chart-pie-income"></canvas></div>
-</div>
+  <div class="grid2">
+    <div class="card"><h2>Monthly Income vs. Expenses</h2><div class="chart-box"><canvas id="barChart"></canvas></div></div>
+    <div class="card"><h2>Cumulative Net Income</h2><div class="chart-box"><canvas id="lineChart"></canvas></div></div>
+  </div>
 
-<div class="pl-section">
-  <h3>Profit &amp; Loss Statement</h3>
-  <table class="pl-table">
-    <thead id="pl-thead"></thead>
-    <tbody id="pl-tbody"></tbody>
-  </table>
-</div>
+  <div class="grid2">
+    <div class="card"><h2>Expenses by Category</h2><div class="chart-box"><canvas id="expensePie"></canvas></div></div>
+    <div class="card"><h2>Income by Source</h2><div class="chart-box"><canvas id="incomePie"></canvas></div></div>
+  </div>
 
-<div class="cf-section">
-  <h3 id="cf-title">Statement of Cash Flows</h3>
-  <table class="cf-table" style="margin-top:16px"><tbody id="cf-tbody"></tbody></table>
-</div>
+  <div class="card" style="margin-bottom:22px;">
+    <h2>Profit &amp; Loss Statement</h2>
+    <div class="pl-table-wrap">
+      <table id="plTable"><thead></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 id="cfTitle">Statement of Cash Flows</h2>
+    <table class="cf-table" id="cfTable"><tbody></tbody></table>
+  </div>
 
 </div>
-<footer>Tom Family Financial Dashboard &bull; QuickBooks Online &ldquo;Personal Life&rdquo; &bull; Generated May 13, 2026</footer>
 
 <script>
-// ── DATA ──────────────────────────────────────────────────────────────────────
+/* ===================== DATA (baked in from QuickBooks, Jan–Jun 2026) ===================== */
 const MONTHS = [
-  { label:'Jan 2026', start:'2026-01-01', end:'2026-01-31' },
-  { label:'Feb 2026', start:'2026-02-01', end:'2026-02-28' },
-  { label:'Mar 2026', start:'2026-03-01', end:'2026-03-31' },
-  { label:'Apr 2026', start:'2026-04-01', end:'2026-04-30' },
-  { label:'May 2026', start:'2026-05-01', end:'2026-05-13' },
+  { key:'2026-01', label:'Jan 2026', start:'2026-01-01', end:'2026-01-31' },
+  { key:'2026-02', label:'Feb 2026', start:'2026-02-01', end:'2026-02-28' },
+  { key:'2026-03', label:'Mar 2026', start:'2026-03-01', end:'2026-03-31' },
+  { key:'2026-04', label:'Apr 2026', start:'2026-04-01', end:'2026-04-30' },
+  { key:'2026-05', label:'May 2026', start:'2026-05-01', end:'2026-05-31' },
+  { key:'2026-06', label:'Jun 2026', start:'2026-06-01', end:'2026-06-15' },
 ];
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-// Income accounts
-const INCOME_ACCOUNTS = [
-  { code:'3001', name:'W2 Income',             vals:[7948.39, 7948.40, 7948.40, 10454.53, 1656.61], isRental:false },
-  { code:'3002', name:'Side Work Income',       vals:[2157.06, 1741.59, 3262.60,   179.14,     0],   isRental:false },
-  { code:'3003', name:'Interest income',        vals:[642.99,   524.21,  506.53,   456.26,     0],   isRental:false },
-  { code:'3004', name:'Rental Property Income', vals:[6722.32, 7854.22, 5164.56,  4518.98,     0],   isRental:true  },
-  { code:'3005', name:'additional taxes owed',  vals:[0,         0,    -801.64,       0,       0],   isRental:false },
-  { code:'3006', name:'Gifts from others',      vals:[482.00,    0,    1247.00,       0,       0],   isRental:false },
-];
-
-// Personal expense accounts 4000
-const EXPENSE_4000 = [
-  { code:'4001.01', name:'Food - Eating Out',         vals:[123.93,  137.98,  173.75,  161.57, 211.24] },
-  { code:'4001.02', name:'Food - Groceries',          vals:[721.63,  667.02,  715.12,  106.48, 203.14] },
-  { code:'4002',    name:'Medical',                   vals:[297.75,  647.06,  292.41,  706.67,   0]    },
-  { code:'4003.01', name:'Gas & Fuel',                vals:[227.97,  208.07,  358.37,  362.78,   0]    },
-  { code:'4003.02', name:'Vehicle Maintenance',       vals:[0,       150.54, 1412.58,  486.79, 275.61] },
-  { code:'4003.03', name:'Vehicle Insurance',         vals:[174.00,  395.04,    0,       0,    308.00] },
-  { code:'4005',    name:'Entertainment',             vals:[45.97,   191.80,   21.99,   36.99,  21.99] },
-  { code:'4007',    name:'Clothes, Home Stuff, Misc', vals:[142.38,  288.48, -188.17, 1813.62, 206.44] },
-  { code:'4008',    name:'Travel',                    vals:[0,      1066.24, -326.17,   63.85,   0]    },
-  { code:'4009',    name:'Gifts',                     vals:[20.00,   143.45,   43.99,   32.95,   0]    },
-  { code:'4011',    name:'Childcare',                 vals:[337.50,    0,       61.25,    0,      0]    },
-];
-
-// Other Expenses
-const OTHER_EXPENSES = [
-  { code:'4999',    name:'OEM Pass Through',  vals:[0,     0,    225.00, -450.00, 225.00] },
-  { code:'—',       name:'Parking & tolls',   vals:[1.35,  0,      7.05,    1.85,   0]    },
-];
-
-// Investment property expense accounts 5000
-const EXPENSE_5000 = [
-  { code:'5001.01', name:'Mortgage Principal Pay down', vals:[8278.80,  4336.70,  1108.53, 11842.85, 4352.13] },
-  { code:'5001.02', name:'Mortgage Interest',           vals:[337.50,    187.50,   337.50,  2701.74,     0]   },
-  { code:'5001',    name:'Mortgages (Other)',           vals:[0,           0,         0,      150.00,  150.00] },
-  { code:'5002',    name:'Property Insurance',          vals:[98.83,      98.83,     98.83,    98.83,  103.25] },
-  { code:'5003',    name:'Property Taxes',              vals:[0,        4123.26,      0,         0,       0]   },
-  { code:'5004',    name:'Maintenance',                 vals:[13173.33, 17528.72,    14.80,  2955.92,     0]   },
-  { code:'5005',    name:'Utilities',                   vals:[346.85,   2666.77,  2456.61,   570.58, 1207.85]  },
-  { code:'5000',    name:'Rental Properties (Other)',   vals:[0,           0,       77.41,      0,       0]    },
-];
-
-// Cash flow per-month arrays from QBO Cash Flow Statement
-const CF_FINANCING      = [238109.65, 53212.02, 0, 0, 0];
-const CF_INVESTING      = [0, 0, 0, 0, 0];
-const CF_BEGINNING_CASH = 108.00;
-
-// Actual "Total for 1000 Cash" from QBO Balance Sheet at each month-end
-const CASH_BALANCES = [233531.06, 274365.96, 286136.88, 281163.23, 276423.66];
-
-// ── FORMATTERS ────────────────────────────────────────────────────────────────
-const usd = v => v.toLocaleString('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2});
-const usdAcct = v => {
-  if (v < 0) return '('+Math.abs(v).toLocaleString('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2})+')';
-  return v.toLocaleString('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2});
+// Per-account monthly values (one entry per MONTHS index). Only accounts that exist in QBO.
+const V = {
+  // Income (3000s)
+  '3001':[7948.39, 7948.40, 7948.40, 10454.53, 9575.48, 2052.68],
+  '3002':[2157.06, 1741.59, 3262.60, 179.14, 1825.61, 0],
+  '3003':[642.99, 524.21, 506.53, 456.26, 552.51, 198.93],
+  '3004':[6722.32, 7854.22, 5164.56, 4518.98, 4877.70, 0],
+  '3005':[0, 0, -801.64, 0, 0, 0],
+  '3006':[482, 0, 1247, 0, 0, 0],
+  // Personal expenses (4000s)
+  '4001.01':[123.93, 137.98, 173.75, 161.57, 249.80, 24.76],
+  '4001.02':[721.63, 667.02, 715.12, 106.48, 451.86, 14.74],
+  '4002':[297.75, 647.06, 292.41, 706.67, 251.26, -130.66],
+  '4003.01':[227.97, 208.07, 358.37, 362.78, 314.89, 83.66],
+  '4003.02':[0, 150.54, 1412.58, 486.79, 1578.41, 0],
+  '4003.03':[174, 395.04, 0, 0, 2466, -973.16],
+  '4003.04':[1.35, 0, 7.05, 1.85, 0, 8.55],
+  '4005':[45.97, 191.80, 21.99, 36.99, 68.79, 21.99],
+  '4007':[142.38, 288.48, -188.17, 1813.62, 435.57, -6.70],
+  '4008':[0, 1066.24, -326.17, 63.85, 0, -300],
+  '4009':[20, 143.45, 43.99, 32.95, 1541.23, 26.47],
+  '4011':[337.50, 0, 61.25, 0, 10.35, -84],
+  // Rental properties (5000s) — investment, toggled
+  '5001.01':[8278.80, 4336.70, 1108.53, 14357.09, 6866.37, 1837.89],
+  '5001.02':[337.50, 187.50, 337.50, 337.50, 337.50, 150],
+  '5002':[98.83, 98.83, 98.83, 98.83, 103.25, 103.25],
+  '5003':[0, 4123.26, 0, 0, 0, 0],
+  '5004':[13173.33, 17528.72, 14.80, 2955.92, 3103.31, 2039.95],
+  '5005':[346.85, 2666.77, 2456.61, 570.58, 2405.95, 0],
+  '5000.other':[0, 0, 77.41, 0, 0, 0],
+  // Other expenses
+  '4999':[0, 0, 225, -450, 225, 0],
 };
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let selStart = 0, selEnd = MONTHS.length - 1, showRental = true;
+// Account tree (display order + hierarchy). invest:true => hidden when toggle off.
+const SECTIONS = [
+  { title:'Income', kind:'income', nodes:[
+    { id:'3000', name:'3000 Income', children:[
+      { id:'3001', name:'3001 W2 Income' },
+      { id:'3002', name:'3002 Side Work Income' },
+      { id:'3003', name:'3003 Interest income' },
+      { id:'3004', name:'3004 Rental Property Income', invest:true },
+      { id:'3005', name:'3005 additional taxes owed' },
+      { id:'3006', name:'3006 Gifts from others' },
+    ]},
+  ]},
+  { title:'Expenses', kind:'expense', nodes:[
+    { id:'4000', name:'4000 Expenses', children:[
+      { id:'4001', name:'4001 Food', children:[
+        { id:'4001.01', name:'4001.01 Food - Eating Out' },
+        { id:'4001.02', name:'4001.02 Food - Groceries' },
+      ]},
+      { id:'4002', name:'4002 Medical' },
+      { id:'4003', name:'4003 Automative', children:[
+        { id:'4003.01', name:'4003.01 Gas & Fuel' },
+        { id:'4003.02', name:'4003.02 Vehicle Maintenance' },
+        { id:'4003.03', name:'4003.03 Vehicle Insurance' },
+        { id:'4003.04', name:'4003.04 Parking & tolls' },
+      ]},
+      { id:'4005', name:'4005 Entertainment' },
+      { id:'4007', name:'4007 Clothes, Home Stuff, Misc' },
+      { id:'4008', name:'4008 Travel' },
+      { id:'4009', name:'4009 Gifts' },
+      { id:'4011', name:'4011 Childcare' },
+    ]},
+    { id:'5000', name:'5000 Rental Properties', invest:true, children:[
+      { id:'5001', name:'5001 Mortgages', children:[
+        { id:'5001.01', name:'5001.01 Mortgage Principal Pay down' },
+        { id:'5001.02', name:'5001.02 Mortgage Interest' },
+      ]},
+      { id:'5002', name:'5002 Property Insurance' },
+      { id:'5003', name:'5003 Property Taxes' },
+      { id:'5004', name:'5004 Maintenance' },
+      { id:'5005', name:'5005 Utilities' },
+      { id:'5000.other', name:'5000 Rental Properties (Other)' },
+    ]},
+  ]},
+  { title:'Other Expenses', kind:'expense', nodes:[
+    { id:'4999', name:'4999 OEM Pass Through' },
+  ]},
+];
 
-// ── HELPERS ───────────────────────────────────────────────────────────────────
-function sumRange(vals, s, e) {
-  let t = 0; for (let i = s; i <= e; i++) t += vals[i]; return t;
+// Cash flow data
+const CF_FINANCING      = [238109.65, 53212.02, 0, 0, 0, 0];   // per-month (derived from cumulative QBO financing)
+const CF_INVESTING      = [0, 0, 0, 0, 0, 0];                  // per-month
+const CF_BEGINNING_CASH = 108.00;                              // Cash at Jan 1, 2026
+// Actual "CASH AT END OF PERIOD" from QBO cash flow for each cumulative month-end period
+const CASH_BALANCES     = [233531.06, 274365.96, 286136.88, 281163.23, 278127.63, 276630.11];
+
+/* ===================== FORMATTERS ===================== */
+const usd = v => v.toLocaleString('en-US', { style:'currency', currency:'USD' });
+function usdAcct(v){
+  if (Object.is(v, -0)) v = 0;
+  const s = Math.abs(v).toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 });
+  return v < 0 ? '($' + s + ')' : '$' + s;
 }
-function monthTotals(i) {
-  const inc  = INCOME_ACCOUNTS.filter(a=>showRental||!a.isRental).reduce((t,a)=>t+a.vals[i],0);
-  const e4   = EXPENSE_4000.reduce((t,a)=>t+a.vals[i],0);
-  const eOth = OTHER_EXPENSES.reduce((t,a)=>t+a.vals[i],0);
-  const e5   = showRental ? EXPENSE_5000.reduce((t,a)=>t+a.vals[i],0) : 0;
-  return { inc, exp: e4+eOth+e5, net: inc-e4-eOth-e5 };
+
+/* ===================== HELPERS ===================== */
+function leafRange(id, s, e){ const a=[]; for(let m=s;m<=e;m++) a.push((V[id]||[])[m]||0); return a; }
+// sum of a node's leaves for one month index, respecting invest toggle
+function nodeMonth(node, m, invest){
+  if (node.invest && !invest) return 0;
+  if (node.children) return node.children.reduce((t,c)=>t+nodeMonth(c,m,invest),0);
+  return (V[node.id]||[])[m]||0;
 }
+function nodeRange(node, s, e, invest){ const a=[]; for(let m=s;m<=e;m++) a.push(nodeMonth(node,m,invest)); return a; }
+const allZero = arr => arr.every(x => Math.abs(x) < 0.005);
+const sum = arr => arr.reduce((a,b)=>a+b,0);
 
-// ── PIE CHART LEGEND FACTORY ──────────────────────────────────────────────────
-const PIE_COLORS = ['#6366f1','#f59e0b','#10b981','#ef4444','#3b82f6','#ec4899','#14b8a6','#f97316','#84cc16','#8b5cf6','#06b6d4','#a78bfa','#fb7185','#fbbf24'];
-
-function pieOptions() {
-  return {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'right',
-        labels: {
-          maxWidth: 280, font: { size: 11 },
-          generateLabels(chart) {
-            const d = chart.data;
-            const total = d.datasets[0].data.reduce((a,b)=>a+b,0);
-            return d.labels.map((lbl,i)=>({
-              text: `${lbl}: ${(d.datasets[0].data[i]/total*100).toFixed(1)}%`,
-              fillStyle: d.datasets[0].backgroundColor[i],
-              hidden: false, index: i,
-            }));
-          }
-        }
-      },
-      tooltip: {
-        callbacks: {
-          label(ctx) {
-            const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
-            return ` ${usd(ctx.parsed)} (${(ctx.parsed/total*100).toFixed(1)}%)`;
-          }
-        }
-      }
+function totalsFor(kind, s, e, invest){
+  const out = new Array(e-s+1).fill(0);
+  for(const sec of SECTIONS){
+    if(sec.kind!==kind) continue;
+    for(const node of sec.nodes){
+      const r = nodeRange(node, s, e, invest);
+      for(let i=0;i<r.length;i++) out[i]+=r[i];
     }
-  };
+  }
+  return out;
 }
 
-// ── CHARTS ────────────────────────────────────────────────────────────────────
-const barChart = new Chart(document.getElementById('chart-bar'),{
-  type:'bar', data:{labels:[],datasets:[]},
-  options:{
-    responsive:true,
-    plugins:{legend:{position:'top'},tooltip:{callbacks:{label:ctx=>` ${usd(ctx.parsed.y)}`}}},
-    scales:{y:{ticks:{callback:v=>usd(v)}}}
-  }
-});
-const lineChart = new Chart(document.getElementById('chart-line'),{
-  type:'line', data:{labels:[],datasets:[]},
-  options:{
-    responsive:true,
-    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${usd(ctx.parsed.y)}`}}},
-    scales:{y:{ticks:{callback:v=>usd(v)}}}
-  }
-});
-const pieExpChart = new Chart(document.getElementById('chart-pie-expense'),{
-  type:'pie', data:{labels:[],datasets:[{data:[],backgroundColor:[]}]}, options:pieOptions()
-});
-const pieIncChart = new Chart(document.getElementById('chart-pie-income'),{
-  type:'pie', data:{labels:[],datasets:[{data:[],backgroundColor:[]}]}, options:pieOptions()
-});
-
-// ── P&L TABLE ─────────────────────────────────────────────────────────────────
-function renderPLTable(s, e) {
-  const thead = document.getElementById('pl-thead');
-  const tbody = document.getElementById('pl-tbody');
-  thead.innerHTML = '';
-  tbody.innerHTML = '';
-  const cols = [];  // month indices in range
-  for (let i = s; i <= e; i++) cols.push(i);
-  const multiMonth = cols.length > 1;
-
-  // Build header row: Account | month columns... | Total
-  const hdrRow = document.createElement('tr');
-  const thAcct = document.createElement('th'); thAcct.textContent = 'Account';
-  hdrRow.appendChild(thAcct);
-  for (const ci of cols) {
-    const th = document.createElement('th'); th.textContent = MONTHS[ci].label;
-    hdrRow.appendChild(th);
-  }
-  if (multiMonth) {
-    const thTot = document.createElement('th'); thTot.textContent = 'Total';
-    hdrRow.appendChild(thTot);
-  }
-  thead.appendChild(hdrRow);
-
-  const numCols = multiMonth ? cols.length + 1 : 1;  // data columns count
-
-  function addSection(code, title, accounts) {
-    const sectionMonthTotals = cols.map(() => 0);
-    let sectionGrandTotal = 0;
-    const itemRows = [];
-
-    // Section header row
-    const hdr = document.createElement('tr');
-    hdr.className = 'section-header';
-    const hd1 = document.createElement('td');
-    hd1.colSpan = numCols + 1;
-    hd1.style.paddingLeft = '12px';
-    hd1.textContent = code ? `${code} ${title}` : title;
-    hdr.appendChild(hd1);
-    tbody.appendChild(hdr);
-
-    // Account rows
-    for (const a of accounts) {
-      const monthVals = cols.map(ci => a.vals[ci]);
-      const total = sumRange(a.vals, s, e);
-      if (monthVals.every(v => v === 0)) continue;  // skip all-zero rows
-      sectionGrandTotal += total;
-      monthVals.forEach((v, k) => sectionMonthTotals[k] += v);
-
-      const tr = document.createElement('tr');
-      tr.className = 'row-item';
-      const td1 = document.createElement('td'); td1.style.paddingLeft = '32px';
-      td1.textContent = `${a.code} ${a.name}`;
-      tr.appendChild(td1);
-      for (const v of monthVals) {
-        const td = document.createElement('td');
-        td.textContent = v === 0 ? '—' : usdAcct(v);
-        tr.appendChild(td);
-      }
-      if (multiMonth) {
-        const tdT = document.createElement('td'); tdT.textContent = usdAcct(total);
-        tr.appendChild(tdT);
-      }
-      tbody.appendChild(tr);
-      itemRows.push(tr);
+/* ===================== TABLE ===================== */
+let gidCounter = 0;
+let collapsedSet = new Set();
+function renderRowsHtml(nodes, s, e, invest, depth, parents){
+  let html='';
+  for(const node of nodes){
+    if(node.invest && !invest) continue;
+    const vals = nodeRange(node, s, e, invest);
+    if(allZero(vals)) continue;
+    if(node.children){
+      const gid = 'g' + (gidCounter++);
+      html += rowHtml({gid, parents, depth, name:node.name, vals, isGroup:true, multi:e>s});
+      html += renderRowsHtml(node.children, s, e, invest, depth+1, parents.concat(gid));
+    } else {
+      html += rowHtml({gid:null, parents, depth, name:node.name, vals, isGroup:false, multi:e>s});
     }
-
-    // Section total row
-    const totTr = document.createElement('tr');
-    totTr.className = 'row-total';
-    const tt1 = document.createElement('td'); tt1.style.paddingLeft = '12px';
-    tt1.textContent = `Total ${title}`;
-    totTr.appendChild(tt1);
-    for (const v of sectionMonthTotals) {
-      const td = document.createElement('td'); td.textContent = usdAcct(v);
-      totTr.appendChild(td);
-    }
-    if (multiMonth) {
-      const tdT = document.createElement('td'); tdT.textContent = usdAcct(sectionGrandTotal);
-      totTr.appendChild(tdT);
-    }
-    tbody.appendChild(totTr);
-
-    // Toggle collapse
-    hdr.addEventListener('click', () => {
-      hdr.classList.toggle('collapsed');
-      [...itemRows, totTr].forEach(r => r.classList.toggle('hidden'));
-    });
-
-    return { monthTotals: sectionMonthTotals, grandTotal: sectionGrandTotal };
   }
-
-  const incAccounts = INCOME_ACCOUNTS.filter(a => showRental || !a.isRental);
-  const inc   = addSection('3000', 'Income', incAccounts);
-  const e4    = addSection('4000', 'Expenses', EXPENSE_4000);
-  const eOth  = addSection('', 'Other Expenses', OTHER_EXPENSES);
-  let e5 = { monthTotals: cols.map(() => 0), grandTotal: 0 };
-  if (showRental) e5 = addSection('5000', 'Rental Properties', EXPENSE_5000);
-
-  // Net Income grand-total row
-  const netTr = document.createElement('tr');
-  netTr.className = 'row-grand-total';
-  const n1 = document.createElement('td'); n1.style.paddingLeft = '12px'; n1.textContent = 'Net Income';
-  netTr.appendChild(n1);
-  for (let k = 0; k < cols.length; k++) {
-    const netMonth = inc.monthTotals[k] - e4.monthTotals[k] - eOth.monthTotals[k] - e5.monthTotals[k];
-    const td = document.createElement('td'); td.textContent = usdAcct(netMonth);
-    netTr.appendChild(td);
-  }
-  if (multiMonth) {
-    const netTotal = inc.grandTotal - e4.grandTotal - eOth.grandTotal - e5.grandTotal;
-    const td = document.createElement('td'); td.textContent = usdAcct(netTotal);
-    netTr.appendChild(td);
-  }
-  tbody.appendChild(netTr);
+  return html;
+}
+function rowHtml({gid, parents, depth, name, vals, isGroup, multi}){
+  const cls = isGroup ? 'group' : 'leaf';
+  const dataGroup = gid ? ` data-group="${gid}"` : '';
+  const dataParents = parents.length ? ` data-parents="${parents.join(' ')}"` : '';
+  const onclick = isGroup ? ` onclick="toggleGroup('${gid}')"` : '';
+  const pad = depth*18;
+  let cells = '';
+  for(const v of vals) cells += `<td>${usdAcct(v)}</td>`;
+  if(multi) cells += `<td>${usdAcct(sum(vals))}</td>`;
+  const arrow = isGroup ? `<span class="arrow" data-arrow="${gid}">▾</span>` : `<span style="display:inline-block;width:14px;"></span>`;
+  return `<tr class="${cls}"${dataGroup}${dataParents}${onclick}>`
+       + `<td><span class="name-cell" style="padding-left:${pad}px">${arrow}${name}</span></td>`
+       + cells + `</tr>`;
+}
+function toggleGroup(gid){
+  if(collapsedSet.has(gid)) collapsedSet.delete(gid); else collapsedSet.add(gid);
+  applyCollapse();
+}
+function applyCollapse(){
+  document.querySelectorAll('#plTable tbody tr[data-parents]').forEach(tr=>{
+    const parents = tr.getAttribute('data-parents').split(' ');
+    const hide = parents.some(p=>collapsedSet.has(p));
+    tr.classList.toggle('collapsed-hidden', hide);
+  });
+  document.querySelectorAll('#plTable [data-arrow]').forEach(a=>{
+    a.textContent = collapsedSet.has(a.getAttribute('data-arrow')) ? '▸' : '▾';
+  });
 }
 
-// ── CASH FLOW ─────────────────────────────────────────────────────────────────
-function renderCashFlow(s, e) {
-  const [,sm] = MONTHS[s].start.split('-').map(Number);
-  const [ey,em,ed] = MONTHS[e].end.split('-').map(Number);
-  const titleStr = sm===em
-    ? `Statement of Cash Flows — ${MONTH_NAMES[sm-1]} ${ey}`
-    : `Statement of Cash Flows — ${MONTH_NAMES[sm-1]} 1 – ${MONTH_NAMES[em-1]} ${ed}, ${ey}`;
-  document.getElementById('cf-title').textContent = titleStr;
+function buildTable(s, e, invest){
+  gidCounter = 0;
+  const multi = e>s;
+  let head = '<tr><th>Account</th>';
+  for(let m=s;m<=e;m++) head += `<th>${MONTHS[m].label}</th>`;
+  if(multi) head += '<th>Total</th>';
+  head += '</tr>';
+  document.querySelector('#plTable thead').innerHTML = head;
 
-  let operating=0, financing=0, investing=0;
-  for (let i=s; i<=e; i++) {
-    operating  += monthTotals(i).net;
-    financing  += CF_FINANCING[i];
-    investing  += CF_INVESTING[i];
+  let body='';
+  for(const sec of SECTIONS){
+    let hasContent=false;
+    for(const node of sec.nodes){
+      if(node.invest && !invest) continue;
+      if(!allZero(nodeRange(node, s, e, invest))) hasContent=true;
+    }
+    if(!hasContent) continue;
+    const colspan = 1 + (e-s+1) + (multi?1:0);
+    body += `<tr class="section"><td colspan="${colspan}">${sec.title}</td></tr>`;
+    body += renderRowsHtml(sec.nodes, s, e, invest, 0, []);
   }
+  // Net income row
+  const inc = totalsFor('income', s, e, invest);
+  const exp = totalsFor('expense', s, e, invest);
+  const net = inc.map((v,i)=>v-exp[i]);
+  let netCells='';
+  for(const v of net) netCells += `<td>${usdAcct(v)}</td>`;
+  if(multi) netCells += `<td>${usdAcct(sum(net))}</td>`;
+  body += `<tr class="netrow"><td><span class="name-cell" style="padding-left:0"><span style="display:inline-block;width:14px;"></span>Net Income</span></td>${netCells}</tr>`;
 
-  // Use actual QBO Balance Sheet "Total for 1000 Cash" values
-  const actualEndCash = CASH_BALANCES[e];
-  const actualBeginCash = s > 0 ? CASH_BALANCES[s - 1] : CF_BEGINNING_CASH;
-
-  document.getElementById('kpi-cash').textContent = usd(actualEndCash);
-
-  const tbody = document.getElementById('cf-tbody');
-  tbody.innerHTML = '';
-  function cfRow(label, value, cls, indent) {
-    const tr = document.createElement('tr');
-    if (cls) tr.className = cls;
-    const td1 = document.createElement('td'); td1.textContent=label;
-    if (indent) td1.style.paddingLeft='28px';
-    const td2 = document.createElement('td'); td2.textContent=(value!==null?usdAcct(value):'');
-    tr.appendChild(td1); tr.appendChild(td2);
-    tbody.appendChild(tr);
-  }
-  cfRow('Operating Activities', null, 'cf-header');
-  cfRow('Net Income (Loss)', operating, 'cf-indent', true);
-  cfRow('Net Cash from Operating Activities', operating, 'cf-subtotal');
-  cfRow('Investing Activities', null, 'cf-header');
-  cfRow('Net Cash from Investing Activities', investing, 'cf-subtotal');
-  cfRow('Financing Activities', null, 'cf-header');
-  if (Math.abs(financing) > 0) cfRow('Opening Balance Equity / Loan Proceeds', financing, 'cf-indent', true);
-  cfRow('Net Cash from Financing Activities', financing, 'cf-subtotal');
-  cfRow('Net Increase (Decrease) in Cash', actualEndCash - actualBeginCash, 'cf-total');
-  cfRow('Cash at Beginning of Period', actualBeginCash, '');
-  cfRow('Cash at End of Period', actualEndCash, 'cf-grand-total');
+  document.querySelector('#plTable tbody').innerHTML = body;
+  applyCollapse();
 }
 
-// ── MAIN UPDATE ───────────────────────────────────────────────────────────────
-function update() {
-  const s=selStart, e=selEnd;
-  let totalInc=0, totalExp=0;
-  for (let i=s; i<=e; i++) { const t=monthTotals(i); totalInc+=t.inc; totalExp+=t.exp; }
-  const netInc = totalInc-totalExp;
+/* ===================== CHARTS ===================== */
+let barChart, lineChart, expensePie, incomePie;
+const PIE_COLORS = ['#2f6df0','#2ca01c','#d64545','#7a4ddb','#e08e0b','#17a2b8','#e0529c','#5a6b7b','#8bc34a','#ff7043','#26a69a'];
+function pct(part, total){ return total>0 ? (part/total*100).toFixed(1)+'%' : '0.0%'; }
+function findNode(id){ for(const sec of SECTIONS) for(const n of sec.nodes){ if(n.id===id) return n; if(n.children){ const f=n.children.find(c=>c.id===id); if(f) return f; } } return {id}; }
 
-  document.getElementById('kpi-income').textContent  = usd(totalInc);
-  document.getElementById('kpi-expense').textContent = usd(totalExp);
-  document.getElementById('kpi-net').textContent     = usd(netInc);
+function buildCharts(s, e, invest){
+  const labels = MONTHS.slice(s, e+1).map(m=>m.label);
+  const inc = totalsFor('income', s, e, invest);
+  const exp = totalsFor('expense', s, e, invest);
+  const net = inc.map((v,i)=>v-exp[i]);
+  let run=0; const cumNet = net.map(v=> (run+=v));
 
-  // Bar chart
-  const labels=[],barInc=[],barExp=[];
-  for (let i=s; i<=e; i++) {
-    const t=monthTotals(i);
-    labels.push(MONTHS[i].label); barInc.push(t.inc); barExp.push(t.exp);
-  }
-  barChart.data.labels=labels;
-  barChart.data.datasets=[
-    {label:'Income',   data:barInc, backgroundColor:'rgba(22,163,74,.7)',  borderColor:'#16a34a',borderWidth:1},
-    {label:'Expenses', data:barExp, backgroundColor:'rgba(220,38,38,.7)',   borderColor:'#dc2626',borderWidth:1},
+  if(barChart) barChart.destroy();
+  barChart = new Chart(document.getElementById('barChart'), {
+    type:'bar',
+    data:{ labels, datasets:[
+      { label:'Income', data:inc, backgroundColor:'#2ca01c' },
+      { label:'Expenses', data:exp, backgroundColor:'#d64545' },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ tooltip:{ callbacks:{ label:c=>c.dataset.label+': '+usd(c.parsed.y) } } },
+      scales:{ y:{ ticks:{ callback:v=>'$'+v.toLocaleString() } } } }
+  });
+
+  if(lineChart) lineChart.destroy();
+  lineChart = new Chart(document.getElementById('lineChart'), {
+    type:'line',
+    data:{ labels, datasets:[
+      { label:'Cumulative Net Income', data:cumNet, borderColor:'#2f6df0', backgroundColor:'rgba(47,109,240,0.12)', fill:true, tension:0.25, pointRadius:3 },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ tooltip:{ callbacks:{ label:c=>'Cumulative: '+usd(c.parsed.y) } } },
+      scales:{ y:{ ticks:{ callback:v=>'$'+v.toLocaleString() } } } }
+  });
+
+  // Expense pie: 4000-series categories + Other Expenses
+  const expCats = [
+    { id:'4001', name:'Food' }, { id:'4002', name:'Medical' }, { id:'4003', name:'Automative' },
+    { id:'4005', name:'Entertainment' }, { id:'4007', name:'Clothes/Home/Misc' }, { id:'4008', name:'Travel' },
+    { id:'4009', name:'Gifts' }, { id:'4011', name:'Childcare' }, { id:'4999', name:'OEM Pass Through' },
   ];
-  barChart.update();
+  let expLabels=[], expData=[];
+  for(const c of expCats){ const t=sum(nodeRange(findNode(c.id), s, e, invest)); if(t>0.005){ expLabels.push(c.name); expData.push(t); } }
+  const expTotal = sum(expData);
 
-  // Line chart (cumulative net)
-  const cumNet=[]; let cum=0;
-  for (let i=s; i<=e; i++) { cum+=monthTotals(i).net; cumNet.push(cum); }
-  lineChart.data.labels=labels;
-  lineChart.data.datasets=[{
-    label:'Cumulative Net Income', data:cumNet,
-    fill:true, backgroundColor:'rgba(37,99,235,.08)',
-    borderColor:'#2563eb', tension:.3, pointRadius:4,
-  }];
-  lineChart.update();
+  if(expensePie) expensePie.destroy();
+  expensePie = new Chart(document.getElementById('expensePie'), {
+    type:'pie',
+    data:{ labels:expLabels, datasets:[{ data:expData, backgroundColor:PIE_COLORS }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{ position:'right', maxWidth:280, labels:{ generateLabels:ch=>{
+          const d=ch.data; return d.labels.map((l,i)=>({ text:`${l} (${pct(d.datasets[0].data[i],expTotal)})`, fillStyle:d.datasets[0].backgroundColor[i], index:i })); } } },
+        tooltip:{ callbacks:{ label:c=>`${c.label}: ${usd(c.parsed)} (${pct(c.parsed,expTotal)})` } }
+      } }
+  });
 
-  // Expense pie (4000-series + Other Expenses, positive totals only)
-  const peLbls=[],peData=[],peCols=[]; let ci=0;
-  for (const a of [...EXPENSE_4000, ...OTHER_EXPENSES]) {
-    const v=sumRange(a.vals,s,e);
-    if (v>0){peLbls.push(a.name);peData.push(v);peCols.push(PIE_COLORS[ci++%PIE_COLORS.length]);}
-  }
-  pieExpChart.data.labels=peLbls;
-  pieExpChart.data.datasets[0]={data:peData,backgroundColor:peCols};
-  pieExpChart.update();
+  // Income pie by source
+  const incCats = [
+    { id:'3001', name:'W2 Income' }, { id:'3002', name:'Side Work' }, { id:'3003', name:'Interest' },
+    { id:'3004', name:'Rental Property', invest:true }, { id:'3005', name:'Additional Taxes' }, { id:'3006', name:'Gifts' },
+  ];
+  let incLabels=[], incData=[];
+  for(const c of incCats){ if(c.invest && !invest) continue; const t=sum(leafRange(c.id, s, e)); if(t>0.005){ incLabels.push(c.name); incData.push(t); } }
+  const incTotal = sum(incData);
 
-  // Income pie (positive totals only, respects rental toggle)
-  const piLbls=[],piData=[],piCols=[]; let pi2=0;
-  for (const a of INCOME_ACCOUNTS) {
-    if (!showRental&&a.isRental) continue;
-    const v=sumRange(a.vals,s,e);
-    if (v>0){piLbls.push(a.name);piData.push(v);piCols.push(PIE_COLORS[pi2++%PIE_COLORS.length]);}
-  }
-  pieIncChart.data.labels=piLbls;
-  pieIncChart.data.datasets[0]={data:piData,backgroundColor:piCols};
-  pieIncChart.update();
-
-  renderPLTable(s, e);
-  renderCashFlow(s, e);
+  if(incomePie) incomePie.destroy();
+  incomePie = new Chart(document.getElementById('incomePie'), {
+    type:'pie',
+    data:{ labels:incLabels, datasets:[{ data:incData, backgroundColor:PIE_COLORS }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{ position:'right', maxWidth:280, labels:{ generateLabels:ch=>{
+          const d=ch.data; return d.labels.map((l,i)=>({ text:`${l} (${pct(d.datasets[0].data[i],incTotal)})`, fillStyle:d.datasets[0].backgroundColor[i], index:i })); } } },
+        tooltip:{ callbacks:{ label:c=>`${c.label}: ${usd(c.parsed)} (${pct(c.parsed,incTotal)})` } }
+      } }
+  });
 }
 
-// ── SELECTORS ─────────────────────────────────────────────────────────────────
-const startSel=document.getElementById('sel-start');
-const endSel  =document.getElementById('sel-end');
-MONTHS.forEach((m,i)=>{startSel.appendChild(new Option(m.label,i));endSel.appendChild(new Option(m.label,i));});
-startSel.value=selStart; endSel.value=selEnd;
-startSel.addEventListener('change',()=>{
-  selStart=parseInt(startSel.value);
-  if(selStart>selEnd){selEnd=selStart;endSel.value=selEnd;}
-  update();
-});
-endSel.addEventListener('change',()=>{
-  selEnd=parseInt(endSel.value);
-  if(selEnd<selStart){selStart=selEnd;startSel.value=selStart;}
-  update();
-});
-document.getElementById('toggle-rental').addEventListener('change',ev=>{showRental=ev.target.checked;update();});
+/* ===================== CASH FLOW ===================== */
+function buildCashFlow(s, e, invest){
+  // Title (parse strings manually to avoid timezone shift)
+  const [sy, sm, sd] = MONTHS[s].start.split('-').map(Number);
+  const [ey, em, ed] = MONTHS[e].end.split('-').map(Number);
+  const startStr = `${MONTH_NAMES[sm-1]} ${sd}` + (sy!==ey ? `, ${sy}` : '');
+  const titleRange = `${startStr} – ${MONTH_NAMES[em-1]} ${ed}, ${ey}`;
+  document.getElementById('cfTitle').textContent = `Statement of Cash Flows — ${titleRange}`;
 
-update();
+  const inc = totalsFor('income', s, e, invest);
+  const exp = totalsFor('expense', s, e, invest);
+  const operating = sum(inc.map((v,i)=>v-exp[i]));   // from P&L net income for selected range
+  const investing = sum(CF_INVESTING.slice(s, e+1));
+  const financing = sum(CF_FINANCING.slice(s, e+1));
+
+  const actualEndCash   = CASH_BALANCES[e];
+  const actualBeginCash = s>0 ? CASH_BALANCES[s-1] : CF_BEGINNING_CASH;
+  const netIncrease     = actualEndCash - actualBeginCash;
+
+  const rows = [
+    ['Cash at Beginning of Period', actualBeginCash, 'cf-final'],
+    ['Net cash from Operating Activities', operating, ''],
+    ['Net cash from Investing Activities', investing, ''],
+    ['Net cash from Financing Activities', financing, ''],
+    ['Net Cash Increase for Period', netIncrease, 'cf-total'],
+    ['Cash at End of Period', actualEndCash, 'cf-final'],
+  ];
+  let html='';
+  for(const [label,val,cls] of rows) html += `<tr class="${cls}"><td style="text-align:left">${label}</td><td>${usdAcct(val)}</td></tr>`;
+  document.querySelector('#cfTable tbody').innerHTML = html;
+}
+
+/* ===================== UPDATE ===================== */
+function update(){
+  const s = parseInt(document.getElementById('startSel').value, 10);
+  let   e = parseInt(document.getElementById('endSel').value, 10);
+  if(e < s){ e = s; document.getElementById('endSel').value = s; }
+  const invest = document.getElementById('investToggle').checked;
+
+  const inc = totalsFor('income', s, e, invest);
+  const exp = totalsFor('expense', s, e, invest);
+  const totalIncome = sum(inc), totalExpenses = sum(exp);
+  document.getElementById('kpiIncome').textContent   = usd(totalIncome);
+  document.getElementById('kpiExpenses').textContent = usd(totalExpenses);
+  document.getElementById('kpiNet').textContent      = usd(totalIncome - totalExpenses);
+  document.getElementById('kpiCash').textContent     = usd(CASH_BALANCES[e]);
+
+  buildTable(s, e, invest);
+  buildCharts(s, e, invest);
+  buildCashFlow(s, e, invest);
+}
+
+/* ===================== INIT ===================== */
+(function init(){
+  const startSel = document.getElementById('startSel');
+  const endSel = document.getElementById('endSel');
+  MONTHS.forEach((m,i)=>{
+    startSel.add(new Option(m.label, i));
+    endSel.add(new Option(m.label, i));
+  });
+  startSel.value = 0;
+  endSel.value = MONTHS.length-1;
+  startSel.addEventListener('change', update);
+  endSel.addEventListener('change', update);
+  document.getElementById('investToggle').addEventListener('change', update);
+  update();
+})();
 </script>
 </body>
 </html>
